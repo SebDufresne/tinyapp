@@ -7,6 +7,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
+const generateRandomString = () => {
+  return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
+};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
