@@ -21,6 +21,15 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+const createUniqueKey = (keyObject) => {
+  let aKey;
+  do {
+    aKey = generateRandomString();
+  } while (keyObject.hasOwnProperty(aKey));
+  return aKey;
+};
+
+
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
@@ -28,6 +37,8 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
+  const randomKey = createUniqueKey(urlDatabase);
+  urlDatabase[randomKey] = req.body.longURL;
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
