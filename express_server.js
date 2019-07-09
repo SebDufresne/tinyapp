@@ -35,10 +35,14 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  const randomKey = createUniqueKey(urlDatabase);
-  urlDatabase[randomKey] = req.body.longURL;
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  if (urlDatabase[req.body.shortURL]) {
+    urlDatabase[req.body.shortURL] = req.body.longURL; 
+  } else {
+    const randomKey = createUniqueKey(urlDatabase);
+    urlDatabase[randomKey] = req.body.longURL;
+  }
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
@@ -59,6 +63,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL/update", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
+});
+
+app.post("/urls/:shortURL", (req, res) => {
+  const {shortURL, longURL} = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  urlDatabase[shortURL] = longURL;
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
