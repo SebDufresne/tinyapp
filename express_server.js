@@ -29,6 +29,14 @@ const createUniqueKey = (keyObject) => {
   return aKey;
 };
 
+app.post("/login", (req, res) => {
+  console.log(req.body);
+  res.cookie('username',req.body.name);
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+});
+
+
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
