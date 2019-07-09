@@ -38,7 +38,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('username',req.body.name);
   const templateVars = {username: req.cookies["username"], urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
