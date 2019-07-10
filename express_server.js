@@ -113,7 +113,7 @@ app.post("/logout", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const user = users[req.cookies['user_id']] || '';
-  const templateVars = {user, urls: urlDatabase };
+  const templateVars = {user, urls: urlsForUser(user.id) };
   res.render('urls_index', templateVars);
 });
 
