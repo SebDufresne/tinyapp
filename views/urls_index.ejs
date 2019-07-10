@@ -10,6 +10,7 @@
 </head>
 <body>
   <% include ./partials/_header %>
+  <% include ./partials/_loginWarning %>
   <main style="margin: 1em;">
     <h3>My URLs</h3>
     <table class="table">
@@ -25,7 +26,7 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%= urls[url].longURL %></td>
             <td>
                 <form method="POST" action="/urls/<%= url %>/update">
                   <div class="button">
