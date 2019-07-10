@@ -59,9 +59,9 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
 
   if (!req.body.email || !req.body.password) {
-    res.status(400);
+    res.render(400);
   } else if (lookupEmail(users,req.body.email)) {
-    res.status(400);
+    res.render(400);
   } else {
     const uniqID = createUniqueKey(urlDatabase);
     users[uniqID] = {id : uniqID, email: req.body.email, password: req.body.email };
@@ -79,9 +79,9 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const idFromEmail = lookupEmail(users,req.body.email);
   if (!idFromEmail) {
-    res.status(403);
+    res.render(403);
   } else if (req.body.password !== users[idFromEmail].password) {
-    res.status(403);
+    res.render(403);
   } else {
     res.cookie('user_id',idFromEmail);
     res.redirect("/urls");
