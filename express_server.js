@@ -44,9 +44,30 @@ const createUniqueKey = (keyObject) => {
   return aKey;
 };
 
+const lookupEmail = (userList, email) => {
+  const allValues = Object.values(userList);
+  const withEmail = allValues.filter(ele => ele.email === email);
+  return withEmail[0].id;
+};
+
 app.get("/register", (req, res) => {
   const templateVars = {username: req.cookies["username"], urls: urlDatabase };
   res.render('register', templateVars);
+});
+
+app.post("/register", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send('No Values!');
+    console.log("ici");
+  } else if (lookupEmail(users,req.body.email)) {
+    res.status(400).send('Email present!');
+    console.log("là");
+  } else {
+    const uniqID = createUniqueKey(urlDatabase);
+    users[uniqID] = {id : uniqID, email: req.body.email, password: req.body.email };
+    res.cookie('id',uniqID);
+    res.redirect("/urls");
+  }
 });
 
 app.post("/login", (req, res) => {
