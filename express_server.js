@@ -46,7 +46,7 @@ const createUniqueKey = (keyObject) => {
 
 const lookupEmail = (userList, email) => {
   const allValues = Object.values(userList);
-  const withEmail = allValues.filter(ele => ele.email === email);
+  const withEmail = allValues.filter(ele => ele.email === email);
   return withEmail[0] ? withEmail[0].id : '';
 };
 
@@ -59,9 +59,9 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
 
   if (!req.body.email || !req.body.password) {
-    res.render(400);
+    res.status(400).send("Fields can't be empty.");
   } else if (lookupEmail(users,req.body.email)) {
-    res.render(400);
+    res.status(400).send("Email already registered to a user.");
   } else {
     const uniqID = createUniqueKey(urlDatabase);
     users[uniqID] = {id : uniqID, email: req.body.email, password: req.body.email };
@@ -79,9 +79,9 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const idFromEmail = lookupEmail(users,req.body.email);
   if (!idFromEmail) {
-    res.render(403);
+    res.status(403).send("Email doesn't match a valid email");
   } else if (req.body.password !== users[idFromEmail].password) {
-    res.render(403);
+    res.status(403).send("Password doesn't match");
   } else {
     res.cookie('user_id',idFromEmail);
     res.redirect("/urls");
@@ -101,7 +101,7 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   if (urlDatabase[req.body.shortURL]) {
-    urlDatabase[req.body.shortURL] = req.body.longURL; 
+    urlDatabase[req.body.shortURL] = req.body.longURL;
   } else {
     const randomKey = createUniqueKey(urlDatabase);
     urlDatabase[randomKey] = req.body.longURL;
