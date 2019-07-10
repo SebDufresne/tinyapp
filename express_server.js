@@ -31,6 +31,11 @@ const createUniqueKey = (keyObject) => {
   return aKey;
 };
 
+app.get("/register", (req, res) => {
+  const templateVars = {username: req.cookies["username"], urls: urlDatabase };
+  res.render('register', templateVars);
+});
+
 app.post("/login", (req, res) => {
   res.cookie('username',req.body.name);
   res.redirect("/urls");
