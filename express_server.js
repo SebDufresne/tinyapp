@@ -14,6 +14,7 @@ const generateRandomString = () => {
   return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
 };
 
+// Returns object with urls associated to an id. If no urls exists, returns empty objecté.
 const urlsForUser = id => {
   const userUrls = {};
   for (const urlId in urlDatabase) {
