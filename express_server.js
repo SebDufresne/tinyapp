@@ -78,15 +78,6 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const idFromEmail = lookupEmail(users,req.body.email);
-  console.log(`idFromEmail ${idFromEmail}`);
-
-  console.log(`req.body.password ${req.body.password}`);
-
-  console.log(`users[idFromEmail] ${users[idFromEmail]}`);
-
-  console.log(`users[idFromEmail].password ${users[idFromEmail].password}`);
-
-  console.log(`users ${users}`);
   if (!idFromEmail) {
     res.status(403).send("Email doesn't match a valid email");
   } else if (req.body.password !== users[idFromEmail].password) {
