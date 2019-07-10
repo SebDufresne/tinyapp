@@ -100,11 +100,11 @@ app.post("/login", (req, res) => {
   if (!idFromEmail) {
     res.status(403).send("Email doesn't match a valid email");
     
-  } else if (!bcrypt.compareSync(req.body.password,users[idFromEmail].password)) {
-    res.status(403).send("Password doesn't match");
-  } else {
+  } else if (bcrypt.compareSync(req.body.password,users[idFromEmail].password)) {
     res.cookie('user_id',idFromEmail);
     res.redirect("/urls");
+  } else {
+    res.status(403).send("Password doesn't match");
   }
 });
 
