@@ -57,11 +57,9 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
-    res.status(400).send('No Values!');
-    console.log("ici");
+    res.status(400);
   } else if (lookupEmail(users,req.body.email)) {
-    res.status(400).send('Email present!');
-    console.log("là");
+    res.status(400);
   } else {
     const uniqID = createUniqueKey(urlDatabase);
     users[uniqID] = {id : uniqID, email: req.body.email, password: req.body.email };
