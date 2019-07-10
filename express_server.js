@@ -113,6 +113,9 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies['user_id']] || '';
+  if (!user) {
+    res.redirect("/login");
+  }
   const templateVars = {user};
   res.render("urls_new", templateVars);
 });
