@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -36,17 +37,17 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "$2b$10$STqQSDAFepyPnfKpL.QYfOu2p7kk3wZ0s5lFSoHQQp91nJjMymYXG"
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: "$2b$10$hF18oxdHmO/ToDB6S.QvD.5Gm0duoml5x0C1bkYKDnuiAQmFhOxqC"
   },
   "aJ48lW": {
     id: "aJ48lW",
     email: "seb@test.test",
-    password: "seb123"
+    password: "$2b$10$8EEQI2mNVRXx6IfxY88XOe0xxh0jfQZvF3A5H2N7czUvnUNvALFBW"
   }
 };
 
@@ -82,7 +83,7 @@ app.post("/register", (req, res) => {
     res.status(400).send("Email already registered to a user.");
   } else {
     const uniqID = createUniqueKey(urlDatabase);
-    users[uniqID] = {id : uniqID, email: req.body.email, password: req.body.password };
+    users[uniqID] = {id : uniqID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10) };
     res.cookie('user_id',uniqID);
     res.redirect("/urls");
   }
@@ -98,7 +99,8 @@ app.post("/login", (req, res) => {
   const idFromEmail = lookupEmail(users,req.body.email);
   if (!idFromEmail) {
     res.status(403).send("Email doesn't match a valid email");
-  } else if (req.body.password !== users[idFromEmail].password) {
+    
+  } else if (!bcrypt.compareSync(req.body.password,users[idFromEmail].password)) {
     res.status(403).send("Password doesn't match");
   } else {
     res.cookie('user_id',idFromEmail);
@@ -118,6 +120,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  
   if (urlDatabase[req.body.shortURL]) {
     urlDatabase[req.body.shortURL] = req.body.longURL;
   } else {
