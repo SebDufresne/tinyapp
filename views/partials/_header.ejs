@@ -21,13 +21,8 @@
           <button type="submit" class="btn btn-outline-dark my-2 my-sm-0">Logout</button>
         </form>
       <% } else { %>
-
-        <form method="Get" action="/login" class="form-inline my-2 my-lg-0 mr-2">
-          <button type="submit" class="btn btn-outline-light my-2 my-sm-0 border-0">Login</button>
-        </form>
-        <form method="Get" action="/register" class="form-inline my-2 my-lg-0">
-          <button type="submit" class="btn btn-outline-light my-2 my-sm-0 border-0">Register</button>
-        </form>
+        <a class="nav-link btn btn-outline-light my-2 my-sm-0 border-0 mr-2" href="/login">Login</a>
+        <a class="nav-link btn btn-outline-light my-2 my-sm-0 border-0" href="/register">Register</a>
       <% } %>
     </div>
   </nav>
