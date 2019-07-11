@@ -149,12 +149,8 @@ app.get('/urls', (req, res) => {
 // Give (GET) the user a form to add new URLs, if not authenticated, return to login page
 app.get('/urls/new', (req, res) => {
   const user = users[req.session.userId] || '';
-  if (!user) {
-    res.redirect('/login');
-  } else {
-    const templateVars = {user};
-    res.render('urls_new', templateVars);
-  }
+  const templateVars = {user};
+  res.render('urls_new', templateVars);
 });
 
 // Adds (Post) URLs to the user profile
