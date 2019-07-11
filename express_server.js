@@ -146,17 +146,21 @@ app.post('/urls', (req, res) => {
 // Give (GET) the user a form to add new URLs, if not authenticated, return to login page
 app.get('/urls/new', (req, res) => {
   const user = users[req.session.userId] || '';
-  const templateVars = {user};
-  res.render('urls_new', templateVars);
+  if (!user) {
+    res.redirect('/login');
+  } else {
+    const templateVars = {user};
+    res.render('urls_new', templateVars);
+  }
 });
 
 
 // Display (GET) the informations for a short url
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
-  const url = { [req.params.shortURL] : {longURL : '', createdDate: '', userID:  ''}};
+  let url = { longURL : '', createdDate: '', userID:  ''};
   if (urlDatabase[req.params.shortURL]) {
-    url[req.params.shortURL] = urlDatabase[req.params.shortURL];
+    url = urlDatabase[req.params.shortURL];
   }
   const templateVars = {user, shortURL : req.params.shortURL, url, moment, toUpdate : false};
   res.render('urls_show', templateVars);
