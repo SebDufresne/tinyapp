@@ -96,7 +96,7 @@ app.post('/register', (req, res) => {
   }
 
   if (res.statusCode === 400) {
-    const templateVars = {user, statusCode: 2400};
+    const templateVars = {user, statusCode: 400};
     res.render('register', templateVars);
   }
 });
