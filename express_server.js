@@ -1,14 +1,22 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
-const app = express();
-const PORT = process.env.PORT || 8080; // default port 8080
+const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 
+const PORT = process.env.PORT || 8080; // default port 8080
+
+const app = express();
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
-
 app.set("view engine", "ejs");
+
+const saltRounds = 10;
+app.use(cookieSession({
+  name: 'userSession',
+  keys: ['Iliketocookpotatoesinthedark', 'Lifeishardwhenthepotatoesarenotfreshandmushy']
+}));
 
 // Generate a random string of 6 hexa charaters
 const generateRandomString = () => {
@@ -80,7 +88,7 @@ app.get("/urls.json", (req, res) => {
 
 // Retrieve (GET) register page
 app.get("/register", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
+  const user = users[req.session.user_id] || '';
   res.render('register', {user});
 });
 
@@ -100,7 +108,7 @@ app.post("/register", (req, res) => {
 
 // Retrieve (GET) login page
 app.get("/login", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
+  const user = users[req.session.user_id] || '';
   res.render('login', {user});
 });
 
@@ -110,7 +118,8 @@ app.post("/login", (req, res) => {
   if (!idFromEmail) {
     res.status(403).send("Email doesn't match a valid email");
   } else if (bcrypt.compareSync(req.body.password,users[idFromEmail].password)) {
-    res.cookie('user_id',idFromEmail);
+    req.session.user_id = idFromEmail;
+    // res.cookie('user_id',idFromEmail);
     res.redirect("/urls");
   } else {
     res.status(403).send("Password doesn't match");
@@ -119,7 +128,7 @@ app.post("/login", (req, res) => {
 
 // Logout functionnality (removes cookie)
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id',req.body.name);
+  req.session = null;
   res.redirect("/urls");
 });
 
@@ -131,14 +140,14 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Retrieve (GET) and display a list of URLs for a user
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
+  const user = users[req.session.user_id] || '';
   const templateVars = {user, urls: urlsForUser(user.id)};
   res.render('urls_index', templateVars);
 });
 
 // Give (GET) the user a form to add new URLs, if not authenticated, return to login page
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
+  const user = users[req.session.user_id] || '';
   if (!user) {
     res.redirect("/login");
   }
@@ -148,7 +157,7 @@ app.get("/urls/new", (req, res) => {
 
 // Adds (Post) URLs to the user profile
 app.post("/urls", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
+  const user = users[req.session.user_id] || '';
 
   if (user) {
     const randomKey = createUniqueKey(urlDatabase);
@@ -160,7 +169,7 @@ app.post("/urls", (req, res) => {
 
 // Allows user to delete own URLs
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
+  const user = users[req.session.user_id] || '';
   if (user.id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
   }
@@ -170,21 +179,21 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // Display (GET) the informations for a short url
 app.post("/urls/:shortURL/update", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
+  const user = users[req.session.user_id] || '';
   const templateVars = {user, shortURL: req.params.shortURL, url: urlDatabase[req.params.shortURL], toUpdate : true};
   res.render("urls_show", templateVars);
 });
 
 // Display (GET) the informations for a short url
 app.get("/urls/:shortURL", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
+  const user = users[req.session.user_id] || '';
   const templateVars = {user, shortURL : req.params.shortURL, url: urlDatabase[req.params.shortURL], toUpdate : false};
   res.render("urls_show", templateVars);
 });
 
 // Process (POST) the form for modifying a URL
 app.post("/urls/:shortURL", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
+  const user = users[req.session.user_id] || '';
   if (user.id === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   }
