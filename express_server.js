@@ -2,6 +2,8 @@ const express = require('express');
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+
+const createUniqueKey = require('./helpers').createUniqueKey;
 const getUserByEmail = require('./helpers').getUserByEmail;
 
 const PORT = process.env.PORT || 8080; // default port 8080
@@ -19,31 +21,6 @@ app.use(cookieSession({
   name: 'userSession',
   keys: ['ThingsPeopleSayArentAlwaysThingsPeopleThink', 'OnceIsEnoughButIsntTwoBetterThenThreeThenWhatIfNever']
 }));
-
-// Generate a random string of 6 hexa charaters
-const generateRandomString = () => {
-  return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
-};
-
-// Valdidate that the unique key isn't already in use by some other user
-const createUniqueKey = (keyObject) => {
-  let aKey;
-  do {
-    aKey = generateRandomString();
-  } while (keyObject.hasOwnProperty(aKey));
-  return aKey;
-};
-
-// Returns object with urls associated to an id. If no urls exists, returns empty objecté.
-const urlsForUser = id => {
-  const userUrls = {};
-  for (const urlId in urlDatabase) {
-    if (urlDatabase[urlId].userID === id) {
-      userUrls[urlId] = urlDatabase[urlId];
-    }
-  }
-  return userUrls;
-};
 
 const urlDatabase = {
   'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID' },
