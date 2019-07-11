@@ -146,8 +146,8 @@ app.post('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-// Allows user to delete own URLs
-app.post('/urls/:shortURL/delete', (req, res) => {
+// Allows user to delete (DELETE) own URLs
+app.delete('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user.id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
@@ -170,8 +170,8 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-// Process (POST) the form for modifying a URL
-app.post('/urls/:shortURL', (req, res) => {
+// Process (UPDATE) the form for modifying a URL
+app.put('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user.id === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
