@@ -96,28 +96,29 @@ app.post("/register", (req, res) => {
 
   if (res.statusCode === 400) {
     res.render('register', {user, statusCode: 400});
-  } else {
-    res.render('register', {user, statusCode: 200});
   }
 });
 
 // Retrieve (GET) login page
 app.get("/login", (req, res) => {
   const user = users[req.session.userId] || '';
-  res.render('login', {user});
+  res.render('login', {user, statusCode: 200});
 });
 
 // Submit (POST) login page
 app.post("/login", (req, res) => {
+  const user = users[req.session.userId] || '';
   const idFromEmail = getUserByEmail(req.body.email,users);
   if (!idFromEmail) {
-    res.status(403).send("Email doesn't match a valid email");
+    res.status(403);
   } else if (bcrypt.compareSync(req.body.password,users[idFromEmail].password)) {
     req.session.userId = idFromEmail;
-    // res.cookie('user_id',idFromEmail);
     res.redirect("/urls");
   } else {
-    res.status(403).send("Password doesn't match");
+    res.status(403);
+  }
+  if (res.statusCode === 403) {
+    res.render('login', {user, statusCode: 403});
   }
 });
 
