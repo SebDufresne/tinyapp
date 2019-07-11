@@ -15,6 +15,15 @@ const generateRandomString = () => {
   return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
 };
 
+// Valdidate that the unique key isn't already in use by some other user
+const createUniqueKey = (keyObject) => {
+  let aKey;
+  do {
+    aKey = generateRandomString();
+  } while (keyObject.hasOwnProperty(aKey));
+  return aKey;
+};
+
 // Returns object with urls associated to an id. If no urls exists, returns empty objecté.
 const urlsForUser = id => {
   const userUrls = {};
@@ -26,11 +35,18 @@ const urlsForUser = id => {
   return userUrls;
 };
 
+// Returns userID based on email address, empty string if not present
+const lookupEmail = (userList, email) => {
+  const allValues = Object.values(userList);
+  const withEmail = allValues.filter(ele => ele.email === email);
+  return withEmail[0] ? withEmail[0].id : '';
+};
+
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
+  "b6UTxQ": { longURL: "https://www.tsn.ca", userID: "userRandomID" },
   "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
-  "b6UTxQ": { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  "i3BoGr": { longURL: "https://www.google.ca", userID: "aJ48lW" }
+  "i3BoGr": { longURL: "https://www.google.ca", userID: "user2RandomID" }
 };
 
 const users = {
@@ -43,40 +59,33 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "$2b$10$hF18oxdHmO/ToDB6S.QvD.5Gm0duoml5x0C1bkYKDnuiAQmFhOxqC"
-  },
-  "aJ48lW": {
-    id: "aJ48lW",
-    email: "seb@test.test",
-    password: "$2b$10$8EEQI2mNVRXx6IfxY88XOe0xxh0jfQZvF3A5H2N7czUvnUNvALFBW"
   }
 };
 
+// Example of GET
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-const createUniqueKey = (keyObject) => {
-  let aKey;
-  do {
-    aKey = generateRandomString();
-  } while (keyObject.hasOwnProperty(aKey));
-  return aKey;
-};
-
-const lookupEmail = (userList, email) => {
-  const allValues = Object.values(userList);
-  const withEmail = allValues.filter(ele => ele.email === email);
-  return withEmail[0] ? withEmail[0].id : '';
-};
-
-app.get("/register", (req, res) => {
-  const user = users[req.cookies['user_id']] || '';
-  const templateVars = {user, urls: urlDatabase };
-  res.render('register', templateVars);
+// Example of template usage
+app.get("/hello", (req, res) => {
+  let templateVars = { greeting: 'Hello World!' };
+  res.render("hello_world", templateVars);
 });
 
-app.post("/register", (req, res) => {
+// Displays list of URLs in JSON format
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
 
+// Retrieve (GET) register page
+app.get("/register", (req, res) => {
+  const user = users[req.cookies['user_id']] || '';
+  res.render('register', {user});
+});
+
+// Submit (POST) register page
+app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
     res.status(400).send("Fields can't be empty.");
   } else if (lookupEmail(users,req.body.email)) {
@@ -89,17 +98,17 @@ app.post("/register", (req, res) => {
   }
 });
 
+// Retrieve (GET) login page
 app.get("/login", (req, res) => {
   const user = users[req.cookies['user_id']] || '';
-  const templateVars = {user, urls: urlDatabase };
-  res.render('login', templateVars);
+  res.render('login', {user});
 });
 
+// Submit (POST) login page
 app.post("/login", (req, res) => {
   const idFromEmail = lookupEmail(users,req.body.email);
   if (!idFromEmail) {
     res.status(403).send("Email doesn't match a valid email");
-    
   } else if (bcrypt.compareSync(req.body.password,users[idFromEmail].password)) {
     res.cookie('user_id',idFromEmail);
     res.redirect("/urls");
@@ -108,30 +117,26 @@ app.post("/login", (req, res) => {
   }
 });
 
+// Logout functionnality (removes cookie)
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id',req.body.name);
   res.redirect("/urls");
 });
 
+// Redirect to another page through a (GET) request
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL].longURL;
+  res.redirect(longURL);
+});
+
+// Retrieve (GET) and display a list of URLs for a user
 app.get("/urls", (req, res) => {
   const user = users[req.cookies['user_id']] || '';
-  const templateVars = {user, urls: urlsForUser(user.id) };
+  const templateVars = {user, urls: urlsForUser(user.id)};
   res.render('urls_index', templateVars);
 });
 
-app.post("/urls", (req, res) => {
-  
-  if (urlDatabase[req.body.shortURL]) {
-    urlDatabase[req.body.shortURL] = req.body.longURL;
-  } else {
-    const randomKey = createUniqueKey(urlDatabase);
-    urlDatabase[randomKey] = req.body.longURL;
-  }
-  const user = users[req.cookies['user_id']] || '';
-  const templateVars = {user,  urls: urlDatabase };
-  res.render("urls_index", templateVars);
-});
-
+// Give (GET) the user a form to add new URLs, if not authenticated, return to login page
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies['user_id']] || '';
   if (!user) {
@@ -141,45 +146,49 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
-});
-
-app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
+// Adds (Post) URLs to the user profile
+app.post("/urls", (req, res) => {
   const user = users[req.cookies['user_id']] || '';
-  const templateVars = {user,  urls: urlDatabase };
+
+  const randomKey = createUniqueKey(urlDatabase);
+  urlDatabase[randomKey] = {longURL: req.body.longURL, userID: user.id};
+
+  const templateVars = {user,  urls: urlsForUser(user.id)};
   res.render("urls_index", templateVars);
 });
 
+// Allows user to delete own URLs
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const user = users[req.cookies['user_id']] || '';
+  if (user.id === urlDatabase[req.params.shortURL].userID) {
+    delete urlDatabase[req.params.shortURL];
+  }
+  const templateVars = {user,  urls: urlsForUser(user.id) };
+  res.render("urls_index", templateVars);
+});
+
+// Display (GET) the informations for a short url
 app.post("/urls/:shortURL/update", (req, res) => {
   const user = users[req.cookies['user_id']] || '';
-  const templateVars = {user, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  const templateVars = {user, shortURL: req.params.shortURL, url: urlDatabase[req.params.shortURL], toUpdate : true};
   res.render("urls_show", templateVars);
 });
 
-app.post("/urls/:shortURL", (req, res) => {
-  const {shortURL, longURL} = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-  urlDatabase[shortURL] = longURL;
-  const user = users[req.cookies['user_id']] || '';
-  const templateVars = {user, urls: urlDatabase };
-  res.render("urls_index", templateVars);
-});
-
+// Display (GET) the informations for a short url
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.cookies['user_id']] || '';
-  const templateVars = {user, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  const templateVars = {user, shortURL : req.params.shortURL, url: urlDatabase[req.params.shortURL], toUpdate : false};
   res.render("urls_show", templateVars);
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  let templateVars = { greeting: 'Hello World!' };
-  res.render("hello_world", templateVars);
+// Process (POST) the form for modifying a URL
+app.post("/urls/:shortURL", (req, res) => {
+  const user = users[req.cookies['user_id']] || '';
+  if (user.id === urlDatabase[req.params.shortURL].userID) {
+    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  }
+  const templateVars = {user, urls: urlsForUser(user.id)};
+  res.render("urls_index", templateVars);
 });
 
 app.listen(PORT, () => {

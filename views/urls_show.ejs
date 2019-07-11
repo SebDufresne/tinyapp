@@ -14,18 +14,19 @@
     <div class="card text-center">
         <div class="card-header"></div>
         <div class="card-body">
-          <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+          <h5 class="card-title">TinyURL for: <%= url.longURL %></h5>
           <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
         </div>
+        <% if (toUpdate && (user.id === url.userID)) { %>
         <div class="card-body bg-light border-top">
             <h2 class="card-title text-muted">Edit</h2>
-            <form method="POST" action="/urls/">
+            <form method="POST" action="/urls/<%= shortURL %>">   <!-- Make sure path is right -->
                 <span class="card-text text-muted font-weight-bold">New URL:</span>
-                <input type="hidden" name="shortURL" value="<%= shortURL %>">
-                <input type="text" name="longURL" value="<%= longURL %>">
+                <input type="text" name="longURL" value="<%= url.longURL %>">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form> 
         </div>
+        <% } %>
       <div class="card-footer text-muted"></div>
     </div>
   <% } %>
