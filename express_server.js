@@ -2,6 +2,7 @@ const express = require("express");
 const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+const getUserByEmail = require('./helpers').getUserByEmail;
 
 const PORT = process.env.PORT || 8080; // default port 8080
 
@@ -41,13 +42,7 @@ const urlsForUser = id => {
   return userUrls;
 };
 
-// Returns first userID based on email address, empty string if not present
-const getUserByEmail = (email, database) => {
-  const allValues = Object.values(database);
-  const withEmail = allValues.filter(ele => ele.email === email);
-  const user = withEmail[0] ? withEmail[0].id : '';
-  return user;
-};
+
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
