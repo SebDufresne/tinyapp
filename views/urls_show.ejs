@@ -9,7 +9,7 @@
 <body>
   <% include ./partials/_header %>
   <% if (!user) { %>
-    <% include ./partials/_loginWarning %>
+    <% include ./partials/_loginRequired %>
   <% } else { %>
     <div class='card text-center'>
         <div class='card-header'></div>
