@@ -31,7 +31,7 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url].longURL %></td>
-            <td>Created</td>
+            <td><%= moment(urls[url].createdDate).format('YYYY-MM-DD'); %></td>
             <td>
               <form method='POST' action='/urls/<%= url %>/update'>
                 <div class='button'>

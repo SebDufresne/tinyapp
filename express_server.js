@@ -27,10 +27,10 @@ app.use(cookieSession({
 }));
 
 const urlDatabase = {
-  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID' },
-  'b6UTxQ': { longURL: 'https://www.tsn.ca', userID: 'userRandomID' },
-  '9sm5xK': { longURL: 'http://www.google.com', userID: 'user2RandomID' },
-  'i3BoGr': { longURL: 'https://www.google.ca', userID: 'user2RandomID' }
+  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', createdDate: '2019-07-11T20:05:23.334Z', userID: 'userRandomID' },
+  'b6UTxQ': { longURL: 'https://www.tsn.ca', createdDate: '2019-07-11T20:05:23.334Z', userID: 'userRandomID' },
+  '9sm5xK': { longURL: 'http://www.google.com', createdDate: '2019-07-11T20:05:23.334Z', userID: 'user2RandomID' },
+  'i3BoGr': { longURL: 'https://www.google.ca', createdDate: '2019-07-11T20:05:23.334Z', userID: 'user2RandomID' }
 };
 
 const users = {
