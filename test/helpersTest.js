@@ -24,14 +24,19 @@ const testUsers = {
 };
 
 describe('getUserByEmail', function() {
-  it('should return a user with valid email', function() {
-    const user = getUserByEmail('user@example.com', testUsers);
+  it('Return a user based on a submitted email', function() {
+    const user = 'user@example.com';
     const expectedOutput = 'userRandomID';
-    assert.strictEqual(user,expectedOutput);
+    assert.strictEqual(getUserByEmail(user, testUsers),expectedOutput);
+  });
+  it("Return an empty string if user doesn't exist", function() {
+    const user = 'noOne@example.com';
+    const expectedOutput = '';
+    assert.strictEqual(getUserByEmail(user, testUsers),expectedOutput);
   });
 });
 
-const urlDatabase = {
+const testDatabase = {
   'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID' },
   'b6UTxQ': { longURL: 'https://www.tsn.ca', userID: 'userRandomID' },
   '9sm5xK': { longURL: 'http://www.google.com', userID: 'user2RandomID' },
@@ -39,11 +44,16 @@ const urlDatabase = {
 };
 
 describe('urlsForUser', function() {
-  it('Confirms it returns strings of 6 characters', function() {
+  it('Returns list of URLs for a given userID', function() {
     const userID = 'userRandomID';
     const expectedOutput = { b2xVn2:
       { longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID' },
     b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'userRandomID' } };
-    assert.deepEqual(urlsForUser(userID,urlDatabase),expectedOutput);
+    assert.deepEqual(urlsForUser(userID,testDatabase),expectedOutput);
+  });
+  it('Returns an empty object if no URLs in DB with that username', function() {
+    const userID = 'noOne';
+    const expectedOutput = { };
+    assert.deepEqual(urlsForUser(userID,testDatabase),expectedOutput);
   });
 });
