@@ -77,20 +77,27 @@ app.get("/", (req, res) => {
 // Retrieve (GET) register page
 app.get("/register", (req, res) => {
   const user = users[req.session.userId] || '';
-  res.render('register', {user});
+  res.render('register', {user, statusCode: 200});
 });
 
 // Submit (POST) register page
 app.post("/register", (req, res) => {
+  const user = users[req.session.userId] || '';
   if (!req.body.email || !req.body.password) {
-    res.status(400).send("Fields can't be empty.");
+    res.status(400);
   } else if (getUserByEmail(req.body.email,users)) {
-    res.status(400).send("Email already registered to a user.");
+    res.status(400);
   } else {
     const uniqID = createUniqueKey(urlDatabase);
     users[uniqID] = {id : uniqID, email: req.body.email, password: bcrypt.hashSync(req.body.password, saltRounds) };
     res.cookie('user_id',uniqID);
     res.redirect("/urls");
+  }
+
+  if (res.statusCode === 400) {
+    res.render('register', {user, statusCode: 400});
+  } else {
+    res.render('register', {user, statusCode: 200});
   }
 });
 
