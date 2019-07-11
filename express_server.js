@@ -170,7 +170,7 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-// Process (UPDATE) the form for modifying a URL
+// Modify (PUT) an URL
 app.put('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user.id === urlDatabase[req.params.shortURL].userID) {
