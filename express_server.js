@@ -150,9 +150,10 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   const user = users[req.cookies['user_id']] || '';
 
-  const randomKey = createUniqueKey(urlDatabase);
-  urlDatabase[randomKey] = {longURL: req.body.longURL, userID: user.id};
-
+  if (user) {
+    const randomKey = createUniqueKey(urlDatabase);
+    urlDatabase[randomKey] = {longURL: req.body.longURL, userID: user.id};
+  }
   const templateVars = {user,  urls: urlsForUser(user.id)};
   res.render("urls_index", templateVars);
 });
@@ -189,6 +190,10 @@ app.post("/urls/:shortURL", (req, res) => {
   }
   const templateVars = {user, urls: urlsForUser(user.id)};
   res.render("urls_index", templateVars);
+});
+
+app.use((req, res, next) => {
+  res.render('404');
 });
 
 app.listen(PORT, () => {
