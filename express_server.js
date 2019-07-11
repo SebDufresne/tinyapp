@@ -74,7 +74,7 @@ app.post('/register', (req, res) => {
   } else {
     const uniqID = createUniqueKey(urlDatabase);
     users[uniqID] = {id : uniqID, email: req.body.email, password: bcrypt.hashSync(req.body.password, saltRounds) };
-    res.cookie('user_id',uniqID);
+    req.session.userId = uniqID;
     res.redirect('/urls');
   }
 
@@ -153,7 +153,6 @@ app.get('/urls/new', (req, res) => {
     res.render('urls_new', templateVars);
   }
 });
-
 
 // Display (GET) the informations for a short url
 app.get('/urls/:shortURL', (req, res) => {
