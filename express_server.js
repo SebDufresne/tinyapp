@@ -1,5 +1,4 @@
 const express = require("express");
-const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
@@ -9,13 +8,12 @@ const PORT = process.env.PORT || 8080; // default port 8080
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 app.set("view engine", "ejs");
 
 const saltRounds = 10;
 app.use(cookieSession({
   name: 'userSession',
-  keys: ['Iliketocookpotatoesinthedark', 'Lifeishardwhenthepotatoesarenotfreshandmushy']
+  keys: ['ThingsPeopleSayArentAlwaysThingsPeopleThink', 'OnceIsEnoughButIsntTwoBetterThanThreeThenWhatIfNever']
 }));
 
 // Generate a random string of 6 hexa charaters
