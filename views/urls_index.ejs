@@ -6,7 +6,7 @@
 
   <!-- Bootstrap CSS -->
   <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css' integrity='sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS' crossorigin='anonymous'>
-  <script scr='https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.26/moment-timezone-utils.min.js'></script>
+
   <title>TinyApp - My URLs</title>
 </head>
 <body>
@@ -31,7 +31,7 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url].longURL %></td>
-            <td><%= moment(urls[url].createdDate).format('YYYY-MM-DD'); %></td>
+            <td><%= moment(urls[url].createdDate).format('YYYY-MM-DD HH:mm [UTC]'); %></td>
             <td>
               <form method='POST' action='/urls/<%= url %>/update'>
                 <div class='button'>

@@ -3,6 +3,7 @@ const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const methodOverride = require('method-override');
+const moment = require('moment-timezone');
 
 const createUniqueKey = require('./helpers').createUniqueKey;
 const getUserByEmail = require('./helpers').getUserByEmail;
@@ -126,7 +127,19 @@ app.get('/u/:shortURL', (req, res) => {
 // Retrieve (GET) and display a list of URLs for a user
 app.get('/urls', (req, res) => {
   const user = users[req.session.userId] || '';
-  const templateVars = {user, urls: urlsForUser(user.id,urlDatabase)};
+  const templateVars = {user, urls: urlsForUser(user.id,urlDatabase), moment};
+  res.render('urls_index', templateVars);
+});
+
+// Adds (Post) URLs to the user profile
+app.post('/urls', (req, res) => {
+  const user = users[req.session.userId] || '';
+
+  if (user) {
+    const randomKey = createUniqueKey(urlDatabase);
+    urlDatabase[randomKey] = {longURL: req.body.longURL, createdDate: new Date(), userID: user.id};
+  }
+  const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase), moment};
   res.render('urls_index', templateVars);
 });
 
@@ -137,17 +150,6 @@ app.get('/urls/new', (req, res) => {
   res.render('urls_new', templateVars);
 });
 
-// Adds (Post) URLs to the user profile
-app.post('/urls', (req, res) => {
-  const user = users[req.session.userId] || '';
-
-  if (user) {
-    const randomKey = createUniqueKey(urlDatabase);
-    urlDatabase[randomKey] = {longURL: req.body.longURL, userID: user.id};
-  }
-  const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase)};
-  res.render('urls_index', templateVars);
-});
 
 // Display (GET) the informations for a short url
 app.get('/urls/:shortURL', (req, res) => {
@@ -166,7 +168,7 @@ app.delete('/urls/:shortURL', (req, res) => {
   if (user.id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
   }
-  const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase) };
+  const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase), moment};
   res.render('urls_index', templateVars);
 });
 
@@ -183,7 +185,7 @@ app.put('/urls/:shortURL', (req, res) => {
   if (user.id === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   }
-  const templateVars = {user, urls: urlsForUser(user.id,urlDatabase)};
+  const templateVars = {user, urls: urlsForUser(user.id,urlDatabase), moment};
   res.render('urls_index', templateVars);
 });
 
