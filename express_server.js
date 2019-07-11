@@ -68,20 +68,14 @@ const users = {
   }
 };
 
-// Example of GET
+// Retrieve login page OR urls
 app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-// Example of template usage
-app.get("/hello", (req, res) => {
-  let templateVars = { greeting: 'Hello World!' };
-  res.render("hello_world", templateVars);
-});
-
-// Displays list of URLs in JSON format
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  const user = users[req.session.userId] || '';
+  if (user) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
 });
 
 // Retrieve (GET) register page
@@ -199,6 +193,7 @@ app.post("/urls/:shortURL", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// If nothing is found, default of 404
 app.use((req, res) => {
   res.render('404');
 });
