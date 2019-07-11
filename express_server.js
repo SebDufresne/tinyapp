@@ -60,8 +60,12 @@ app.get('/', (req, res) => {
 // Retrieve (GET) register page
 app.get('/register', (req, res) => {
   const user = users[req.session.userId] || '';
-  const templateVars = {user, statusCode: 200};
-  res.render('register', templateVars);
+  if (user) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {user, statusCode: 200};
+    res.render('register', templateVars);  
+  }
 });
 
 // Submit (POST) register page
