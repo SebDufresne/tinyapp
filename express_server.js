@@ -8,6 +8,9 @@ const PORT = process.env.PORT || 8080; // default port 8080
 
 const app = express();
 
+// specify the static asset folder (css, images, etc)
+app.use(express.static('public'));
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 
