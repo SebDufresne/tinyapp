@@ -98,7 +98,7 @@ app.post("/register", (req, res) => {
     res.status(400).send("Email already registered to a user.");
   } else {
     const uniqID = createUniqueKey(urlDatabase);
-    users[uniqID] = {id : uniqID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10) };
+    users[uniqID] = {id : uniqID, email: req.body.email, password: bcrypt.hashSync(req.body.password, saltRounds) };
     res.cookie('user_id',uniqID);
     res.redirect("/urls");
   }
