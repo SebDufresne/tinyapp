@@ -42,8 +42,6 @@ const urlsForUser = id => {
   return userUrls;
 };
 
-
-
 const urlDatabase = {
   'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID' },
   'b6UTxQ': { longURL: 'https://www.tsn.ca', userID: 'userRandomID' },
@@ -150,9 +148,10 @@ app.get('/urls/new', (req, res) => {
   const user = users[req.session.userId] || '';
   if (!user) {
     res.redirect('/login');
+  } else {
+    const templateVars = {user};
+    res.render('urls_new', templateVars);
   }
-  const templateVars = {user};
-  res.render('urls_new', templateVars);
 });
 
 // Adds (Post) URLs to the user profile
