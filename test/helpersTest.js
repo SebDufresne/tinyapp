@@ -1,5 +1,13 @@
 const { assert } = require('chai');
-const { getUserByEmail } = require('../helpers.js');
+const generateRandomString = require('../helpers.js').generateRandomString;
+const getUserByEmail = require('../helpers.js').getUserByEmail;
+
+describe('generateRandomString', function() {
+  it('Confirms it returns strings of 6 characters', function() {
+    const expectedLength = 6;
+    assert.strictEqual(generateRandomString().length,expectedLength);
+  });
+});
 
 const testUsers = {
   'userRandomID': {
@@ -13,6 +21,8 @@ const testUsers = {
     password: 'dishwasher-funk'
   }
 };
+
+
 
 describe('getUserByEmail', function() {
   it('should return a user with valid email', function() {
