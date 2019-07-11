@@ -125,11 +125,14 @@ app.post('/logout', (req, res) => {
 
 // Redirect to another page through a (GET) request
 app.get('/u/:shortURL', (req, res) => {
-  let longURL = '/urls';
   if (urlDatabase[req.params.shortURL]) {
-    longURL = urlDatabase[req.params.shortURL].longURL;
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longURL);
+  } else {
+    const user = users[req.session.userId] || '';
+    const templateVars = {user};
+    res.render('404',templateVars);
   }
-  res.redirect(longURL);
 });
 
 // Retrieve (GET) and display a list of URLs for a user
