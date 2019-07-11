@@ -2,6 +2,7 @@ const express = require('express');
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const methodOverride = require('method-override');
 
 const createUniqueKey = require('./helpers').createUniqueKey;
 const getUserByEmail = require('./helpers').getUserByEmail;
@@ -15,6 +16,8 @@ const app = express();
 app.use(express.static('public'));
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
+
 app.set('view engine', 'ejs');
 
 const saltRounds = 10;
