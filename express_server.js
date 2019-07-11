@@ -64,7 +64,7 @@ app.get('/register', (req, res) => {
     res.redirect('/urls');
   } else {
     const templateVars = {user, statusCode: 200};
-    res.render('register', templateVars);  
+    res.render('register', templateVars);
   }
 });
 
@@ -91,8 +91,12 @@ app.post('/register', (req, res) => {
 // Retrieve (GET) login page
 app.get('/login', (req, res) => {
   const user = users[req.session.userId] || '';
-  const templateVars = {user, statusCode: 200};
-  res.render('login', templateVars);
+  if (user) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {user, statusCode: 200};
+    res.render('login', templateVars);
+  }
 });
 
 // Submit (POST) login page
@@ -161,12 +165,14 @@ app.get('/urls/new', (req, res) => {
 // Display (GET) the informations for a short url
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
-  let url = { longURL : '', createdDate: '', userID:  ''};
   if (urlDatabase[req.params.shortURL]) {
-    url = urlDatabase[req.params.shortURL];
+    const url = urlDatabase[req.params.shortURL];
+    const templateVars = {user, shortURL : req.params.shortURL, url, moment, toUpdate : false};
+    res.render('urls_show', templateVars);
+  } else {
+    const templateVars = {user};
+    res.render('404',templateVars);
   }
-  const templateVars = {user, shortURL : req.params.shortURL, url, moment, toUpdate : false};
-  res.render('urls_show', templateVars);
 });
 
 // Allows user to delete (DELETE) own URLs
@@ -174,26 +180,39 @@ app.delete('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user.id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
+    const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase), moment};
+    res.render('urls_index', templateVars);
+  } else {
+    const templateVars = {user};
+    res.render('404',templateVars);
   }
-  const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase), moment};
-  res.render('urls_index', templateVars);
 });
 
 // Display (GET) the informations for a short url
-app.post('/urls/:shortURL/update', (req, res) => {
+app.get('/urls/:shortURL/edit', (req, res) => {
   const user = users[req.session.userId] || '';
-  const templateVars = {user, shortURL: req.params.shortURL, url: urlDatabase[req.params.shortURL], moment, toUpdate : true};
-  res.render('urls_show', templateVars);
+  if (urlDatabase[req.params.shortURL]) {
+    const templateVars = {user, shortURL: req.params.shortURL, url: urlDatabase[req.params.shortURL], moment, toUpdate : true};
+    res.render('urls_show', templateVars);
+  } else {
+    const templateVars = {user};
+    res.render('404',templateVars);
+  }
 });
 
 // Modify (PUT) an URL
 app.put('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
-  if (user.id === urlDatabase[req.params.shortURL].userID) {
-    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  if (urlDatabase[req.params.shortURL]) {
+    if (user.id === urlDatabase[req.params.shortURL].userID) {
+      urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+    }
+    const templateVars = {user, urls: urlsForUser(user.id,urlDatabase), moment};
+    res.render('urls_index', templateVars);
+  } else {
+    const templateVars = {user};
+    res.render('404',templateVars);
   }
-  const templateVars = {user, urls: urlsForUser(user.id,urlDatabase), moment};
-  res.render('urls_index', templateVars);
 });
 
 // If nothing is found, default of 404
