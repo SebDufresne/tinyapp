@@ -13,7 +13,7 @@ app.set("view engine", "ejs");
 const saltRounds = 10;
 app.use(cookieSession({
   name: 'userSession',
-  keys: ['ThingsPeopleSayArentAlwaysThingsPeopleThink', 'OnceIsEnoughButIsntTwoBetterThanThreeThenWhatIfNever']
+  keys: ['ThingsPeopleSayArentAlwaysThingsPeopleThink', 'OnceIsEnoughButIsntTwoBetterThenThreeThenWhatIfNever']
 }));
 
 // Generate a random string of 6 hexa charaters
@@ -199,7 +199,7 @@ app.post("/urls/:shortURL", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.render('404');
 });
 
