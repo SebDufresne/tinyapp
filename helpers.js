@@ -14,25 +14,29 @@ const generateRandomString = () => {
 };
 
 // Valdidate that the unique key isn't already in use by some other user
-const createUniqueKey = (keyObject) => {
+const createUniqueKey = database => {
   let aKey;
   do {
     aKey = generateRandomString();
-  } while (keyObject.hasOwnProperty(aKey));
+  } while (database.hasOwnProperty(aKey));
   return aKey;
 };
 
 // Returns object with urls associated to an id. If no urls exists, returns empty objecté.
-const urlsForUser = id => {
+const urlsForUser = (id, database) => {
   const userUrls = {};
-  for (const urlId in urlDatabase) {
-    if (urlDatabase[urlId].userID === id) {
-      userUrls[urlId] = urlDatabase[urlId];
+  for (const urlId in database) {
+    if (database[urlId].userID === id) {
+      userUrls[urlId] = database[urlId];
     }
   }
+  console.log(userUrls);
   return userUrls;
 };
+
 module.exports = {
+  createUniqueKey,
   generateRandomString,
   getUserByEmail,
+  urlsForUser,
 };

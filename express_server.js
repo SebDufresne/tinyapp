@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 
 const createUniqueKey = require('./helpers').createUniqueKey;
 const getUserByEmail = require('./helpers').getUserByEmail;
+const urlsForUser = require('./helpers').urlsForUser;
 
 const PORT = process.env.PORT || 8080; // default port 8080
 
@@ -119,7 +120,7 @@ app.get('/u/:shortURL', (req, res) => {
 // Retrieve (GET) and display a list of URLs for a user
 app.get('/urls', (req, res) => {
   const user = users[req.session.userId] || '';
-  const templateVars = {user, urls: urlsForUser(user.id)};
+  const templateVars = {user, urls: urlsForUser(user.id,urlDatabase)};
   res.render('urls_index', templateVars);
 });
 
@@ -138,7 +139,7 @@ app.post('/urls', (req, res) => {
     const randomKey = createUniqueKey(urlDatabase);
     urlDatabase[randomKey] = {longURL: req.body.longURL, userID: user.id};
   }
-  const templateVars = {user,  urls: urlsForUser(user.id)};
+  const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase)};
   res.render('urls_index', templateVars);
 });
 
@@ -148,7 +149,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   if (user.id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
   }
-  const templateVars = {user,  urls: urlsForUser(user.id) };
+  const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase) };
   res.render('urls_index', templateVars);
 });
 
@@ -172,7 +173,7 @@ app.post('/urls/:shortURL', (req, res) => {
   if (user.id === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   }
-  const templateVars = {user, urls: urlsForUser(user.id)};
+  const templateVars = {user, urls: urlsForUser(user.id,urlDatabase)};
   res.render('urls_index', templateVars);
 });
 
