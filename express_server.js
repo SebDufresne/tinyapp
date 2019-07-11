@@ -112,11 +112,11 @@ app.post('/login', (req, res) => {
   const idFromEmail = getUserByEmail(req.body.email,users);
   if (!idFromEmail) {
     res.status(403);
-  } else if (bcrypt.compareSync(req.body.password,users[idFromEmail].password)) {
+  } else if (!bcrypt.compareSync(req.body.password,users[idFromEmail].password)) {
+    res.status(403);
+  } else {
     req.session.userId = idFromEmail;
     res.redirect('/urls');
-  } else {
-    res.status(403);
   }
   if (res.statusCode === 403) {
     const templateVars = {user, statusCode: 403};
