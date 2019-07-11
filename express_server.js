@@ -41,11 +41,12 @@ const urlsForUser = id => {
   return userUrls;
 };
 
-// Returns userID based on email address, empty string if not present
-const lookupEmail = (userList, email) => {
-  const allValues = Object.values(userList);
+// Returns first userID based on email address, empty string if not present
+const getUserByEmail = (email, database) => {
+  const allValues = Object.values(database);
   const withEmail = allValues.filter(ele => ele.email === email);
-  return withEmail[0] ? withEmail[0].id : '';
+  const user = withEmail[0] ? withEmail[0].id : '';
+  return user;
 };
 
 const urlDatabase = {
@@ -88,7 +89,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
     res.status(400).send("Fields can't be empty.");
-  } else if (lookupEmail(users,req.body.email)) {
+  } else if (getUserByEmail(req.body.email,users)) {
     res.status(400).send("Email already registered to a user.");
   } else {
     const uniqID = createUniqueKey(urlDatabase);
@@ -106,7 +107,7 @@ app.get("/login", (req, res) => {
 
 // Submit (POST) login page
 app.post("/login", (req, res) => {
-  const idFromEmail = lookupEmail(users,req.body.email);
+  const idFromEmail = getUserByEmail(req.body.email,users);
   if (!idFromEmail) {
     res.status(403).send("Email doesn't match a valid email");
   } else if (bcrypt.compareSync(req.body.password,users[idFromEmail].password)) {
