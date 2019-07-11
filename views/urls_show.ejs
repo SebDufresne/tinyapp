@@ -16,6 +16,7 @@
         <div class='card-body'>
           <h5 class='card-title'>TinyURL for: <%= url.longURL %></h5>
           <p class='card-text'>Short URL: <a href='/u/<%= shortURL %>'><%= shortURL %></a></p>
+          <p class='card-text'>Created date: <%= moment(url.createdDate).format('YYYY-MM-DD HH:mm [UTC]'); %></p>
         </div>
         <% if (toUpdate && (user.id === url.userID)) { %>
         <div class='card-body bg-light border-top'>

@@ -154,11 +154,11 @@ app.get('/urls/new', (req, res) => {
 // Display (GET) the informations for a short url
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
-  const url = { [req.params.shortURL] : {longURL : '', userID:  ''}};
+  const url = { [req.params.shortURL] : {longURL : '', createdDate: '', userID:  ''}};
   if (urlDatabase[req.params.shortURL]) {
     url[req.params.shortURL] = urlDatabase[req.params.shortURL];
   }
-  const templateVars = {user, shortURL : req.params.shortURL, url, toUpdate : false};
+  const templateVars = {user, shortURL : req.params.shortURL, url, moment, toUpdate : false};
   res.render('urls_show', templateVars);
 });
 
@@ -175,7 +175,7 @@ app.delete('/urls/:shortURL', (req, res) => {
 // Display (GET) the informations for a short url
 app.post('/urls/:shortURL/update', (req, res) => {
   const user = users[req.session.userId] || '';
-  const templateVars = {user, shortURL: req.params.shortURL, url: urlDatabase[req.params.shortURL], toUpdate : true};
+  const templateVars = {user, shortURL: req.params.shortURL, url: urlDatabase[req.params.shortURL], moment, toUpdate : true};
   res.render('urls_show', templateVars);
 });
 
