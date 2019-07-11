@@ -30,7 +30,6 @@ const urlsForUser = (id, database) => {
       userUrls[urlId] = database[urlId];
     }
   }
-  console.log(userUrls);
   return userUrls;
 };
 
