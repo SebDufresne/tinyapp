@@ -116,7 +116,10 @@ app.post('/logout', (req, res) => {
 
 // Redirect to another page through a (GET) request
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
+  let longURL = '/urls';
+  if (urlDatabase[req.params.shortURL]) {
+    longURL = urlDatabase[req.params.shortURL].longURL;
+  }
   res.redirect(longURL);
 });
 
@@ -146,6 +149,17 @@ app.post('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
+// Display (GET) the informations for a short url
+app.get('/urls/:shortURL', (req, res) => {
+  const user = users[req.session.userId] || '';
+  const url = { [req.params.shortURL] : {longURL : '', userID:  ''}};
+  if (urlDatabase[req.params.shortURL]) {
+    url[req.params.shortURL] = urlDatabase[req.params.shortURL];
+  }
+  const templateVars = {user, shortURL : req.params.shortURL, url, toUpdate : false};
+  res.render('urls_show', templateVars);
+});
+
 // Allows user to delete (DELETE) own URLs
 app.delete('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
@@ -160,13 +174,6 @@ app.delete('/urls/:shortURL', (req, res) => {
 app.post('/urls/:shortURL/update', (req, res) => {
   const user = users[req.session.userId] || '';
   const templateVars = {user, shortURL: req.params.shortURL, url: urlDatabase[req.params.shortURL], toUpdate : true};
-  res.render('urls_show', templateVars);
-});
-
-// Display (GET) the informations for a short url
-app.get('/urls/:shortURL', (req, res) => {
-  const user = users[req.session.userId] || '';
-  const templateVars = {user, shortURL : req.params.shortURL, url: urlDatabase[req.params.shortURL], toUpdate : false};
   res.render('urls_show', templateVars);
 });
 
