@@ -3,6 +3,7 @@ const generateRandomStr = require('../helpers').generateRandomStr;
 const getUserByEmail = require('../helpers').getUserByEmail;
 const urlsForUser = require('../helpers').urlsForUser;
 const listVisitors = require('../helpers').listVisitors;
+const listVisits = require('../helpers').listVisits;
 
 describe('generateRandomStr', function() {
   it('Confirms it returns strings of 6 characters', function() {
@@ -93,7 +94,7 @@ describe('urlsForUser', function() {
 
 describe('listVisitors', function() {
   it('Returns empty array if no visitors went', function() {
-    const urlId = 'noOne';
+    const urlId = 'noUrl';
     const expectedOutput = [];
     assert.deepEqual(listVisitors(urlId,testDatabase),expectedOutput);
   });
@@ -103,3 +104,27 @@ describe('listVisitors', function() {
     assert.deepEqual(listVisitors(urlId,testDatabase).sort(),expectedOutput);
   });
 });
+
+describe('listVisits', function() {
+  it('Returns empty array if the website has no visits', function() {
+    const urlId = 'noUrl';
+    const expectedOutput = [];
+    assert.deepEqual(listVisits(urlId,testDatabase),expectedOutput);
+  });
+  it('Returns an array of visits for a given urlId', function() {
+    const urlId = 'b2xVn2';
+    const expectedOutput = [ {'b82da6': '2019-07-12T02:14:29.343Z'},
+      {'b82da6': '2019-07-12T02:14:38.574Z'},
+      {'b82da6': '2019-07-12T02:14:45.547Z'},
+      {'6ac336': '2019-07-12T02:15:07.643Z'}
+    ];
+    assert.deepEqual(listVisits(urlId,testDatabase).sort(),expectedOutput);
+  });
+});
+
+const testVisits = [ 
+  {'b82da6': '2019-07-12T02:14:45.547Z'},
+  {'6ac336': '2019-07-12T02:15:07.643Z'},
+  {'b82da6': '2019-07-12T02:14:29.343Z'},
+  {'b82da6': '2019-07-12T02:14:38.574Z'}
+];

@@ -45,9 +45,24 @@ const listVisitors = (urlId, database) => {
   return visitorsList;
 };
 
+// Returns an array of Object {guestId: Date} for a given urlId
+// If no visits, returns empty Array
+const listVisits = (urlId, database) => {
+  const visitsList = [];
+  if (database[urlId]) {
+    for (const visitor in database[urlId].visited) {
+      for (const visit of database[urlId].visited[visitor]) {
+        visitsList.push({[visitor] : visit});
+      }
+    }
+  }
+  return visitsList;
+};
+
 module.exports = {
   createUniqueKey,
   listVisitors,
+  listVisits,
   generateRandomStr,
   getUserByEmail,
   urlsForUser,
