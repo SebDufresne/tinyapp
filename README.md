@@ -52,11 +52,10 @@ A list of every visit for a given short URL, sorted by dates, from most recent t
 - Install all dependencies (using the `npm install` command).
 - Run the development web server using the `node express_server.js` command.
 
-
 ## Current Limitations/Bugs/Future Features
 
-- The selected menu item doesn't highlight properly
-- There's a "blind spot" behind the footer, where items can be unaccessible
-- The tables could benefit from a grid styling approach
-- The breakpoints for a mobile first approach would need reviewing.
-- Add the number of users/total visits on URL index page.
+- BUG: The selected menu item doesn't highlight properly
+- BUG: There's a "blind spot" behind the footer, where items can be unaccessible
+- TO-DO: Re-style the tables with a grid approach.
+- TO-DO: Review the breakpoints for a mobile first approach.
+- TO-DO: Add the number of users/total visits on URL index page.
