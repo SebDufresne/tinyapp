@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const methodOverride = require('method-override');
@@ -167,7 +168,7 @@ app.post('/urls', (req, res) => {
     const templateVars = {user, shortURL : randomKey, url, moment};
     res.render('urls_show', templateVars);
   } else {
-    const error = "You need to be logged in to add an URL";
+    const error = "You need to be logged in to add a tinyURL";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
@@ -198,7 +199,7 @@ app.get('/urls/:shortURL', (req, res) => {
         const templateVars = {user, shortURL : req.params.shortURL, url, moment};
         res.render('urls_show', templateVars);
       } else {
-        const error = "You can only view informations for URLs belonging to you";
+        const error = "You can only view informations of your tinyURLs";
         const templateVars = {user, error};
         res.render('404',templateVars);
       }
@@ -208,7 +209,7 @@ app.get('/urls/:shortURL', (req, res) => {
       res.render('404',templateVars);
     }
   } else {
-    const error = "You need to be logged in to display the informations for a tinyURL";
+    const error = "You need to be logged in to display the informations of a tinyURL";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
@@ -236,13 +237,16 @@ app.put('/urls/:shortURL', (req, res) => {
       res.render('404',templateVars);
     }
   } else {
-    const error = "You need to be logged in to display the informations for a tinyURL";
+    const error = "You need to be logged in to modify a tinyURL";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
 });
 
-// Allows user to delete (DELETE) own URLs
+// Deletes a user tinyURL
+// If the tinyURL doesn't belong to the user, returns a 404
+// If the tinyURL doesn't exist, returns a 404
+// If user isn't logged in, returns a 404
 app.delete('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user) {
@@ -261,7 +265,7 @@ app.delete('/urls/:shortURL', (req, res) => {
       res.render('404',templateVars);
     }
   } else {
-    const error = "You need to be logged in to display the informations for a tinyURL";
+    const error = "You need to be logged in to delete a tinyURL";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
