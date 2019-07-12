@@ -30,10 +30,26 @@ app.use(cookieSession({
 }));
 
 const urlDatabase = {
-  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', createdDate: '2019-07-11T20:05:23.334Z', userId: 'userRandomID' },
-  'b6UTxQ': { longURL: 'https://www.tsn.ca', createdDate: '2019-07-11T20:05:23.334Z', userId: 'userRandomID' },
-  '9sm5xK': { longURL: 'http://www.google.com', createdDate: '2019-07-11T20:05:23.334Z', userId: 'user2RandomID' },
-  'i3BoGr': { longURL: 'https://www.google.ca', createdDate: '2019-07-11T20:05:23.334Z', userId: 'user2RandomID' }
+  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca',
+    createdDate: '2019-07-11T20:05:23.334Z',
+    userId: 'userRandomID',
+    visited: {}
+  },
+  'b6UTxQ': { longURL: 'https://www.tsn.ca',
+    createdDate: '2019-07-11T20:05:23.334Z',
+    userId: 'userRandomID',
+    visited: {}
+  },
+  '9sm5xK': { longURL: 'http://www.google.com',
+    createdDate: '2019-07-11T20:05:23.334Z',
+    userId: 'user2RandomID',
+    visited: {}
+  },
+  'i3BoGr': { longURL: 'https://www.google.ca',
+    createdDate: '2019-07-11T20:05:23.334Z',
+    userId: 'user2RandomID',
+    visited: {}
+  }
 };
 
 const users = {
@@ -143,7 +159,7 @@ app.get('/u/:shortURL', (req, res) => {
     res.cookie('guestId',guestId);
   }
 
-  
+
 
   // Standard page redirection
   const user = users[req.session.userId] || '';
@@ -177,7 +193,7 @@ app.post('/urls', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user) {
     const randomKey = createUniqueKey(urlDatabase);
-    urlDatabase[randomKey] = {longURL: req.body.longURL, createdDate: new Date(), userId: user.id};
+    urlDatabase[randomKey] = {longURL: req.body.longURL, createdDate: new Date(), userId: user.id, visited: {}};
     const url = urlDatabase[randomKey];
     const templateVars = {user, shortURL : randomKey, url, moment};
     res.render('urls_show', templateVars);
