@@ -6,6 +6,10 @@ const bcrypt = require('bcrypt');
 const methodOverride = require('method-override');
 const moment = require('moment-timezone');
 const generateRandomStr = require('./helpers.js').generateRandomStr;
+const listVisitors = require('./helpers').listVisitors;
+const listVisits = require('./helpers').listVisits;
+const sortByDate = require('./helpers').sortByDate;
+const sortVisitListDesc = require('./helpers').sortVisitListDesc;
 
 const createUniqueKey = require('./helpers').createUniqueKey;
 const getUserByEmail = require('./helpers').getUserByEmail;
@@ -157,7 +161,7 @@ app.post('/logout', (req, res) => {
 // Redirects to another page
 // If shortURL doesn't exists, displays 404
 app.get('/u/:shortURL', (req, res) => {
-  // User tracking portion
+  const shortURL = req.params.shortURL;
 
   // Make sure the user has a guestID cookie
   // Generates one if they don't
@@ -167,19 +171,19 @@ app.get('/u/:shortURL', (req, res) => {
     res.cookie('guestId',guestId);
   }
 
-  if (urlDatabase[req.params.shortURL]) {
+  if (urlDatabase[shortURL]) {
     // Increment visits
-    if (!urlDatabase[req.params.shortURL].visited[guestId]) {
-      urlDatabase[req.params.shortURL].visited[guestId] = [];
+    if (!urlDatabase[shortURL].visited[guestId]) {
+      urlDatabase[shortURL].visited[guestId] = [];
     }
-    urlDatabase[req.params.shortURL].visited[guestId].push(new Date());
+    urlDatabase[shortURL].visited[guestId].push(new Date());
 
     // Page redirection
-    const longURL = urlDatabase[req.params.shortURL].longURL;
+    const longURL = urlDatabase[shortURL].longURL;
     res.redirect(longURL);
   } else {
     const user = users[req.session.userId] || '';
-    const error = "The tinyURL you're trying to access doesn't exist";
+    const error = "The shortURL you're trying to access doesn't exist";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
@@ -204,13 +208,15 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user) {
-    const randomKey = createUniqueKey(urlDatabase);
-    urlDatabase[randomKey] = {longURL: req.body.longURL, createdDate: new Date(), userId: user.id, visited: {}};
-    const url = urlDatabase[randomKey];
-    const templateVars = {user, shortURL : randomKey, url, moment};
+    const shortURL = createUniqueKey(urlDatabase);
+    urlDatabase[shortURL] = {longURL: req.body.longURL, createdDate: new Date(), userId: user.id, visited: {}};
+    const url = urlDatabase[shortURL];
+    const uniqVisitors = 0;
+    const totalVisits = 0;
+    const templateVars = {user, shortURL, url, uniqVisitors, totalVisits, moment};
     res.render('urls_show', templateVars);
   } else {
-    const error = "You need to be logged in to add a tinyURL";
+    const error = "You need to be logged in to add a shortURL";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
@@ -229,44 +235,48 @@ app.get('/urls/new', (req, res) => {
 });
 
 // Displays the informations for a short url belonging to a user
-// If the tinyURL doesn't belong to the user, returns a 404
-// If the tinyURL doesn't exist, returns a 404
+// If the shortURL doesn't belong to the user, returns a 404
+// If the shortURL doesn't exist, returns a 404
 // If user isn't logged in, returns a 404
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
+  const shortURL = req.params.shortURL;
   if (user) {
-    if (urlDatabase[req.params.shortURL]) {
-      if (urlDatabase[req.params.shortURL].userId === user.id) {
-        const url = urlDatabase[req.params.shortURL];
-        const templateVars = {user, shortURL : req.params.shortURL, url, moment};
+    if (urlDatabase[shortURL]) {
+      if (urlDatabase[shortURL].userId === user.id) {
+        const url = urlDatabase[shortURL];
+        const uniqVisitors = listVisitors(shortURL,urlDatabase).length;
+        const totalVisits = listVisits(shortURL,urlDatabase).length;
+        const templateVars = {user, shortURL, url, uniqVisitors, totalVisits, moment};
         res.render('urls_show', templateVars);
       } else {
-        const error = "You can only view informations of your tinyURLs";
+        const error = "You can only view informations of your shortURLs";
         const templateVars = {user, error};
         res.render('404',templateVars);
       }
     } else {
-      const error = "This tinyURL doesn't exist";
+      const error = "This shortURL doesn't exist";
       const templateVars = {user, error};
       res.render('404',templateVars);
     }
   } else {
-    const error = "You need to be logged in to display the informations of a tinyURL";
+    const error = "You need to be logged in to display the informations of a shortURL";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
 });
 
-// Modify a tinyURL
-// If the tinyURL doesn't belong to the user, returns a 404
-// If the tinyURL doesn't exist, returns a 404
+// Modify a shortURL
+// If the shortURL doesn't belong to the user, returns a 404
+// If the shortURL doesn't exist, returns a 404
 // If user isn't logged in, returns a 404
 app.put('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
+  const shortURL = req.params.shortURL;
   if (user) {
-    if (urlDatabase[req.params.shortURL]) {
-      if (user.id === urlDatabase[req.params.shortURL].userId) {
-        urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+    if (urlDatabase[shortURL]) {
+      if (user.id === urlDatabase[shortURL].userId) {
+        urlDatabase[shortURL].longURL = req.body.longURL;
         res.redirect('/urls');
       } else {
         const error = "You can only modify URLs belonging to you";
@@ -279,22 +289,23 @@ app.put('/urls/:shortURL', (req, res) => {
       res.render('404',templateVars);
     }
   } else {
-    const error = "You need to be logged in to modify a tinyURL";
+    const error = "You need to be logged in to modify a shortURL";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
 });
 
-// Deletes a user tinyURL
-// If the tinyURL doesn't belong to the user, returns a 404
-// If the tinyURL doesn't exist, returns a 404
+// Deletes a user shortURL
+// If the shortURL doesn't belong to the user, returns a 404
+// If the shortURL doesn't exist, returns a 404
 // If user isn't logged in, returns a 404
 app.delete('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
+  const shortURL = req.params.shortURL;
   if (user) {
-    if (urlDatabase[req.params.shortURL]) {
-      if (user.id === urlDatabase[req.params.shortURL].userId) {
-        delete urlDatabase[req.params.shortURL];
+    if (urlDatabase[shortURL]) {
+      if (user.id === urlDatabase[shortURL].userId) {
+        delete urlDatabase[shortURL];
         res.redirect('/urls');
       } else {
         const error = "You can only delete a URL that belongs to you";
@@ -302,12 +313,12 @@ app.delete('/urls/:shortURL', (req, res) => {
         res.render('404',templateVars);
       }
     } else {
-      const error = "The tinyURL you're trying to delete doesn't exists";
+      const error = "The shortURL you're trying to delete doesn't exists";
       const templateVars = {user, error};
       res.render('404',templateVars);
     }
   } else {
-    const error = "You need to be logged in to delete a tinyURL";
+    const error = "You need to be logged in to delete a shortURL";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }

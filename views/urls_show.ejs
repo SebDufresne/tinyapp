@@ -20,6 +20,8 @@
             <h5 class='card-title'>TinyURL for: <%= url.longURL %></h5>
             <p class='card-text'>Short URL: <a href='/u/<%= shortURL %>'><%= shortURL %></a></p>
             <p class='card-text'>Created date: <%= moment(url.createdDate).format('YYYY-MM-DD HH:mm [UTC]'); %></p>
+            <p class='card-text'>Unique visitors: <%= uniqVisitors %></p>
+            <p class='card-text'>Total visits: <%= totalVisits %></p>
           </div>
           <div class='card-body bg-light border-top'>
               <h2 class='card-title text-muted'>Edit</h2>
