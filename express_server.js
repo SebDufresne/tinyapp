@@ -31,24 +31,27 @@ app.use(cookieSession({
 
 const urlDatabase = {
   'b2xVn2': { longURL: 'http://www.lighthouselabs.ca',
-    createdDate: '2019-07-11T20:05:23.334Z',
+    createdDate:'2019-07-11T20:05:23.334Z',
     userId: 'userRandomID',
-    visited: {}
+    visited: {
+      'b82da6': ['2019-07-12T02:14:29.343Z', '2019-07-12T02:14:38.574Z', '2019-07-12T02:14:45.547Z'],
+      '6ac336' : ['2019-07-12T02:15:07.643Z']
+    }
   },
   'b6UTxQ': { longURL: 'https://www.tsn.ca',
-    createdDate: '2019-07-11T20:05:23.334Z',
+    createdDate:	'2019-07-11T20:05:23.334Z',
     userId: 'userRandomID',
-    visited: {}
+    visited:	{}
   },
   '9sm5xK': { longURL: 'http://www.google.com',
-    createdDate: '2019-07-11T20:05:23.334Z',
+    createdDate:	'2019-07-11T20:05:23.334Z',
     userId: 'user2RandomID',
-    visited: {}
+    visited:	{}
   },
   'i3BoGr': { longURL: 'https://www.google.ca',
-    createdDate: '2019-07-11T20:05:23.334Z',
+    createdDate:	'2019-07-11T20:05:23.334Z',
     userId: 'user2RandomID',
-    visited: {}
+    visited:	{}
   }
 };
 

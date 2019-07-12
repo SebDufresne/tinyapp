@@ -37,7 +37,11 @@ const urlsForUser = (userId, database) => {
 // If none, returns empty Array
 const listVisitors = (urlId, database) => {
   const visitorsList = [];
-
+  if (database[urlId]) {
+    for (const visitor in database[urlId].visited) {
+      visitorsList.push(visitor);
+    }
+  }
   return visitorsList;
 };
 
