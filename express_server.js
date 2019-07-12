@@ -73,11 +73,6 @@ const users = {
   }
 };
 
-// Displays list of URLs in JSON format
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
-
 // Displays login page if user isn't logged in
 // Displays /urls if user is logged in
 app.get('/', (req, res) => {
