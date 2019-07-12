@@ -28,10 +28,10 @@ app.use(cookieSession({
 }));
 
 const urlDatabase = {
-  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', createdDate: '2019-07-11T20:05:23.334Z', userID: 'userRandomID' },
-  'b6UTxQ': { longURL: 'https://www.tsn.ca', createdDate: '2019-07-11T20:05:23.334Z', userID: 'userRandomID' },
-  '9sm5xK': { longURL: 'http://www.google.com', createdDate: '2019-07-11T20:05:23.334Z', userID: 'user2RandomID' },
-  'i3BoGr': { longURL: 'https://www.google.ca', createdDate: '2019-07-11T20:05:23.334Z', userID: 'user2RandomID' }
+  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', createdDate: '2019-07-11T20:05:23.334Z', userId: 'userRandomID' },
+  'b6UTxQ': { longURL: 'https://www.tsn.ca', createdDate: '2019-07-11T20:05:23.334Z', userId: 'userRandomID' },
+  '9sm5xK': { longURL: 'http://www.google.com', createdDate: '2019-07-11T20:05:23.334Z', userId: 'user2RandomID' },
+  'i3BoGr': { longURL: 'https://www.google.ca', createdDate: '2019-07-11T20:05:23.334Z', userId: 'user2RandomID' }
 };
 
 const users = {
@@ -47,7 +47,8 @@ const users = {
   }
 };
 
-// Retrieve login page OR urls
+// Displays login page if user isn't logged in
+// Displays /urls if user is logged in
 app.get('/', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user) {
@@ -57,7 +58,8 @@ app.get('/', (req, res) => {
   }
 });
 
-// Retrieve (GET) register page
+// Displays Register Page
+// Redirect user to /urls if already lgged in
 app.get('/register', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user) {
@@ -68,7 +70,8 @@ app.get('/register', (req, res) => {
   }
 });
 
-// Submit (POST) register page
+// Submits Register Page
+// Gives error 400 if fields are empty or email is already in use
 app.post('/register', (req, res) => {
   const user = users[req.session.userId] || '';
   if (!req.body.email || !req.body.password) {
@@ -76,9 +79,9 @@ app.post('/register', (req, res) => {
   } else if (getUserByEmail(req.body.email,users)) {
     res.status(400);
   } else {
-    const uniqID = createUniqueKey(urlDatabase);
-    users[uniqID] = {id : uniqID, email: req.body.email, password: bcrypt.hashSync(req.body.password, saltRounds) };
-    req.session.userId = uniqID;
+    const uniqId = createUniqueKey(urlDatabase);
+    users[uniqId] = {id : uniqId, email: req.body.email, password: bcrypt.hashSync(req.body.password, saltRounds) };
+    req.session.userId = uniqId;
     res.redirect('/urls');
   }
 
@@ -88,7 +91,8 @@ app.post('/register', (req, res) => {
   }
 });
 
-// Retrieve (GET) login page
+// Displays login page
+// Redirect user to /urls if user is already logged in
 app.get('/login', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user) {
@@ -99,7 +103,8 @@ app.get('/login', (req, res) => {
   }
 });
 
-// Submit (POST) login page
+// Submits Login Page
+// Gives error 403 if fields are empty or password doesn't match
 app.post('/login', (req, res) => {
   const user = users[req.session.userId] || '';
   const idFromEmail = getUserByEmail(req.body.email,users);
@@ -117,63 +122,122 @@ app.post('/login', (req, res) => {
   }
 });
 
-// Logout functionnality (removes cookie)
+// Logout user (removes cookie)
 app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect('/urls');
 });
 
-// Redirect to another page through a (GET) request
+// Redirects to another page
+// If shortURL doesn't exists, displays 404
 app.get('/u/:shortURL', (req, res) => {
+  const user = users[req.session.userId] || '';
   if (urlDatabase[req.params.shortURL]) {
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
   } else {
-    const user = users[req.session.userId] || '';
-    const templateVars = {user};
+    const error = "The tinyURL you're trying to access doesn't exist";
+    const templateVars = {user, error};
     res.render('404',templateVars);
   }
 });
 
-// Retrieve (GET) and display a list of URLs for a user
+// Displays a list of URLs for a user
+// If the user isn't logged in, gives 404
 app.get('/urls', (req, res) => {
   const user = users[req.session.userId] || '';
-  const templateVars = {user, urls: urlsForUser(user.id,urlDatabase), moment};
-  res.render('urls_index', templateVars);
+  if (user) {
+    const templateVars = {user, urls: urlsForUser(user.id,urlDatabase), moment};
+    res.render('urls_index', templateVars);
+  } else {
+    const error = 'You need to login to display this page';
+    const templateVars = {user, error};
+    res.render('404',templateVars);
+  }
 });
 
-// Adds (Post) URLs to the user profile
+// Adds a URL to the user profile
+// If the user isn't logged in, gives 404
 app.post('/urls', (req, res) => {
   const user = users[req.session.userId] || '';
-
   if (user) {
     const randomKey = createUniqueKey(urlDatabase);
-    urlDatabase[randomKey] = {longURL: req.body.longURL, createdDate: new Date(), userID: user.id};
-  }
-  const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase), moment};
-  res.render('urls_index', templateVars);
-});
-
-// Give (GET) the user a form to add new URLs, if not authenticated, return to login page
-app.get('/urls/new', (req, res) => {
-  const user = users[req.session.userId] || '';
-  if (!user) {
-    res.redirect('/login');
-  } else {
-    const templateVars = {user};
-    res.render('urls_new', templateVars);
-  }
-});
-
-// Display (GET) the informations for a short url
-app.get('/urls/:shortURL', (req, res) => {
-  const user = users[req.session.userId] || '';
-  if (urlDatabase[req.params.shortURL]) {
-    const url = urlDatabase[req.params.shortURL];
-    const templateVars = {user, shortURL : req.params.shortURL, url, moment, toUpdate : false};
+    urlDatabase[randomKey] = {longURL: req.body.longURL, createdDate: new Date(), userId: user.id};
+    const url = urlDatabase[randomKey];
+    const templateVars = {user, shortURL : randomKey, url, moment};
     res.render('urls_show', templateVars);
   } else {
+    const error = "You need to be logged in to add an URL";
+    const templateVars = {user, error};
+    res.render('404',templateVars);
+  }
+});
+
+// Displays a form to add new URLs
+// If the user isn't authenticated, returns to login page
+app.get('/urls/new', (req, res) => {
+  const user = users[req.session.userId] || '';
+  if (user) {
     const templateVars = {user};
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login');
+  }
+});
+
+// Displays the informations for a short url belonging to a user
+// If the tinyURL doesn't belong to the user, returns a 404
+// If the tinyURL doesn't exist, returns a 404
+// If user isn't logged in, returns a 404
+app.get('/urls/:shortURL', (req, res) => {
+  const user = users[req.session.userId] || '';
+  if (user) {
+    if (urlDatabase[req.params.shortURL]) {
+      if (urlDatabase[req.params.shortURL].userId === user.id) {
+        const url = urlDatabase[req.params.shortURL];
+        const templateVars = {user, shortURL : req.params.shortURL, url, moment};
+        res.render('urls_show', templateVars);
+      } else {
+        const error = "You can only view informations for URLs belonging to you";
+        const templateVars = {user, error};
+        res.render('404',templateVars);
+      }
+    } else {
+      const error = "This tinyURL doesn't exist";
+      const templateVars = {user, error};
+      res.render('404',templateVars);
+    }
+  } else {
+    const error = "You need to be logged in to display the informations for a tinyURL";
+    const templateVars = {user, error};
+    res.render('404',templateVars);
+  }
+});
+
+// Modify a tinyURL
+// If the tinyURL doesn't belong to the user, returns a 404
+// If the tinyURL doesn't exist, returns a 404
+// If user isn't logged in, returns a 404
+app.put('/urls/:shortURL', (req, res) => {
+  const user = users[req.session.userId] || '';
+  if (user) {
+    if (urlDatabase[req.params.shortURL]) {
+      if (user.id === urlDatabase[req.params.shortURL].userId) {
+        urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+        res.redirect('/urls');
+      } else {
+        const error = "You can only modify URLs belonging to you";
+        const templateVars = {user, error};
+        res.render('404',templateVars);
+      }
+    } else {
+      const error = "The URL you're trying to modify doesn't exists";
+      const templateVars = {user, error};
+      res.render('404',templateVars);
+    }
+  } else {
+    const error = "You need to be logged in to display the informations for a tinyURL";
+    const templateVars = {user, error};
     res.render('404',templateVars);
   }
 });
@@ -181,47 +245,33 @@ app.get('/urls/:shortURL', (req, res) => {
 // Allows user to delete (DELETE) own URLs
 app.delete('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
-  if (user.id === urlDatabase[req.params.shortURL].userID) {
-    delete urlDatabase[req.params.shortURL];
-    const templateVars = {user,  urls: urlsForUser(user.id,urlDatabase), moment};
-    res.render('urls_index', templateVars);
-  } else {
-    const templateVars = {user};
-    res.render('404',templateVars);
-  }
-});
-
-// Display (GET) the informations for a short url
-app.get('/urls/:shortURL/edit', (req, res) => {
-  const user = users[req.session.userId] || '';
-  if (urlDatabase[req.params.shortURL]) {
-    const templateVars = {user, shortURL: req.params.shortURL, url: urlDatabase[req.params.shortURL], moment, toUpdate : true};
-    res.render('urls_show', templateVars);
-  } else {
-    const templateVars = {user};
-    res.render('404',templateVars);
-  }
-});
-
-// Modify (PUT) an URL
-app.put('/urls/:shortURL', (req, res) => {
-  const user = users[req.session.userId] || '';
-  if (urlDatabase[req.params.shortURL]) {
-    if (user.id === urlDatabase[req.params.shortURL].userID) {
-      urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  if (user) {
+    if (urlDatabase[req.params.shortURL]) {
+      if (user.id === urlDatabase[req.params.shortURL].userId) {
+        delete urlDatabase[req.params.shortURL];
+        res.redirect('/urls');
+      } else {
+        const error = "You can only delete a URL that belongs to you";
+        const templateVars = {user, error};
+        res.render('404',templateVars);
+      }
+    } else {
+      const error = "The tinyURL you're trying to delete doesn't exists";
+      const templateVars = {user, error};
+      res.render('404',templateVars);
     }
-    const templateVars = {user, urls: urlsForUser(user.id,urlDatabase), moment};
-    res.render('urls_index', templateVars);
   } else {
-    const templateVars = {user};
+    const error = "You need to be logged in to display the informations for a tinyURL";
+    const templateVars = {user, error};
     res.render('404',templateVars);
   }
 });
 
-// If nothing is found, default of 404
+// If the content isn't found redirect to 404
 app.use((req, res) => {
   const user = users[req.session.userId] || '';
-  const templateVars = {user};
+  const error = 'UNKOWN ERROR, the developer screwed up somewhere, ごめんなさい =^.^=';
+  const templateVars = {user, error};
   res.render('404',templateVars);
 });
 

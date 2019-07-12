@@ -21,16 +21,14 @@
             <p class='card-text'>Short URL: <a href='/u/<%= shortURL %>'><%= shortURL %></a></p>
             <p class='card-text'>Created date: <%= moment(url.createdDate).format('YYYY-MM-DD HH:mm [UTC]'); %></p>
           </div>
-          <% if (toUpdate && (user.id === url.userID)) { %>
           <div class='card-body bg-light border-top'>
               <h2 class='card-title text-muted'>Edit</h2>
               <form method='POST' action='/urls/<%= shortURL %>?_method=PUT'>
                   <span class='card-text text-muted font-weight-bold'>New URL:</span>
                   <input type='text' name='longURL' value='<%= url.longURL %>'>
-                  <button type='submit' class='btn btn-primary'>Submit</button>
+                  <button type='submit' class='btn btn-primary'>Update</button>
               </form> 
           </div>
-          <% } %>
         <div class='card-footer text-muted'></div>
       </div>
     <% } %>

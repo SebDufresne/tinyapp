@@ -1,6 +1,6 @@
 const uuidv4 = require('uuid/v4');
 
-// Returns first userID based on email address, empty string if not present
+// Returns first userId based on email address, empty string if not present
 const getUserByEmail = (email, database) => {
   const allValues = Object.values(database);
   const withEmail = allValues.filter(ele => ele.email === email);
@@ -26,7 +26,7 @@ const createUniqueKey = database => {
 const urlsForUser = (id, database) => {
   const userUrls = {};
   for (const urlId in database) {
-    if (database[urlId].userID === id) {
+    if (database[urlId].userId === id) {
       userUrls[urlId] = database[urlId];
     }
   }

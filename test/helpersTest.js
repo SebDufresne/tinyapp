@@ -37,23 +37,23 @@ describe('getUserByEmail', function() {
 });
 
 const testDatabase = {
-  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID' },
-  'b6UTxQ': { longURL: 'https://www.tsn.ca', userID: 'userRandomID' },
-  '9sm5xK': { longURL: 'http://www.google.com', userID: 'user2RandomID' },
-  'i3BoGr': { longURL: 'https://www.google.ca', userID: 'user2RandomID' }
+  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', userId: 'userRandomID' },
+  'b6UTxQ': { longURL: 'https://www.tsn.ca', userId: 'userRandomID' },
+  '9sm5xK': { longURL: 'http://www.google.com', userId: 'user2RandomID' },
+  'i3BoGr': { longURL: 'https://www.google.ca', userId: 'user2RandomID' }
 };
 
 describe('urlsForUser', function() {
-  it('Returns list of URLs for a given userID', function() {
-    const userID = 'userRandomID';
+  it('Returns list of URLs for a given userId', function() {
+    const userId = 'userRandomID';
     const expectedOutput = { b2xVn2:
-      { longURL: 'http://www.lighthouselabs.ca', userID: 'userRandomID' },
-    b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'userRandomID' } };
-    assert.deepEqual(urlsForUser(userID,testDatabase),expectedOutput);
+      { longURL: 'http://www.lighthouselabs.ca', userId: 'userRandomID' },
+    b6UTxQ: { longURL: 'https://www.tsn.ca', userId: 'userRandomID' } };
+    assert.deepEqual(urlsForUser(userId,testDatabase),expectedOutput);
   });
   it('Returns an empty object if no URLs in DB with that username', function() {
-    const userID = 'noOne';
+    const userId = 'noOne';
     const expectedOutput = { };
-    assert.deepEqual(urlsForUser(userID,testDatabase),expectedOutput);
+    assert.deepEqual(urlsForUser(userId,testDatabase),expectedOutput);
   });
 });
