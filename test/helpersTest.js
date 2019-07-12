@@ -4,6 +4,8 @@ const getUserByEmail = require('../helpers').getUserByEmail;
 const urlsForUser = require('../helpers').urlsForUser;
 const listVisitors = require('../helpers').listVisitors;
 const listVisits = require('../helpers').listVisits;
+const sortByDate = require('../helpers').sortByDate;
+const sortVisitListDesc = require('../helpers').sortVisitListDesc;
 
 describe('generateRandomStr', function() {
   it('Confirms it returns strings of 6 characters', function() {
@@ -122,9 +124,26 @@ describe('listVisits', function() {
   });
 });
 
-const testVisits = [ 
+const testVisits = [
   {'b82da6': '2019-07-12T02:14:45.547Z'},
   {'6ac336': '2019-07-12T02:15:07.643Z'},
   {'b82da6': '2019-07-12T02:14:29.343Z'},
   {'b82da6': '2019-07-12T02:14:38.574Z'}
 ];
+
+describe('sortVisitListDesc with sortByDate', function() {
+  it('Returns empty array if the website has no visits', function() {
+    const visitList = [];
+    const expectedOutput = [];
+    assert.deepEqual(sortVisitListDesc(visitList,sortByDate),expectedOutput);
+  });
+  it('Returns an array of visits sorted by date desc', function() {
+    const expectedOutput = [
+      {'6ac336': '2019-07-12T02:15:07.643Z'},
+      {'b82da6': '2019-07-12T02:14:45.547Z'},
+      {'b82da6': '2019-07-12T02:14:38.574Z'},
+      {'b82da6': '2019-07-12T02:14:29.343Z'},
+    ];
+    assert.deepEqual(sortVisitListDesc(testVisits,sortByDate),expectedOutput);
+  });
+});

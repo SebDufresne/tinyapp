@@ -59,11 +59,23 @@ const listVisits = (urlId, database) => {
   return visitsList;
 };
 
+// Callback to sort by Dates in Ascending Order
+const sortByDate = (obj1, obj2) => {
+  return new Date(Object.values(obj1)[0]) - new Date(Object.values(obj2)[0]);
+};
+
+// Sort an array of Visits in descending Order
+const sortVisitListDesc = (list, sortOrder) => {
+  return list.sort(sortOrder).reverse();
+};
+
 module.exports = {
   createUniqueKey,
   listVisitors,
   listVisits,
   generateRandomStr,
   getUserByEmail,
+  sortByDate,
+  sortVisitListDesc,
   urlsForUser,
 };
