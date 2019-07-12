@@ -9,7 +9,7 @@ const getUserByEmail = (email, database) => {
 };
 
 // Generate a random string of 6 hexa charaters
-const generateRandomString = () => {
+const generateRandomStr = () => {
   return uuidv4().slice(0,6);
 };
 
@@ -17,7 +17,7 @@ const generateRandomString = () => {
 const createUniqueKey = database => {
   let aKey;
   do {
-    aKey = generateRandomString();
+    aKey = generateRandomStr();
   } while (database.hasOwnProperty(aKey));
   return aKey;
 };
@@ -35,7 +35,7 @@ const urlsForUser = (id, database) => {
 
 module.exports = {
   createUniqueKey,
-  generateRandomString,
+  generateRandomStr,
   getUserByEmail,
   urlsForUser,
 };

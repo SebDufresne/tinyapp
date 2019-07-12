@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const methodOverride = require('method-override');
 const moment = require('moment-timezone');
+const generateRandomStr = require('./helpers.js').generateRandomStr;
 
 const createUniqueKey = require('./helpers').createUniqueKey;
 const getUserByEmail = require('./helpers').getUserByEmail;
@@ -16,8 +17,8 @@ const app = express();
 
 // specify the static asset folder (css, images, etc)
 app.use(express.static('public'));
-
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
@@ -132,6 +133,19 @@ app.post('/logout', (req, res) => {
 // Redirects to another page
 // If shortURL doesn't exists, displays 404
 app.get('/u/:shortURL', (req, res) => {
+  // User tracking portion
+
+  // Make sure the user has a guestID cookie
+  // Generates one if they don't
+  const guestCookie = req.cookies['guestId'];
+  const guestId = guestCookie || generateRandomStr();
+  if (!guestCookie) {
+    res.cookie('guestId',guestId);
+  }
+
+  
+
+  // Standard page redirection
   const user = users[req.session.userId] || '';
   if (urlDatabase[req.params.shortURL]) {
     const longURL = urlDatabase[req.params.shortURL].longURL;

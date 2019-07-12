@@ -1,12 +1,12 @@
 const { assert } = require('chai');
-const generateRandomString = require('../helpers.js').generateRandomString;
+const generateRandomStr = require('../helpers.js').generateRandomStr;
 const getUserByEmail = require('../helpers.js').getUserByEmail;
 const urlsForUser = require('../helpers').urlsForUser;
 
-describe('generateRandomString', function() {
+describe('generateRandomStr', function() {
   it('Confirms it returns strings of 6 characters', function() {
     const expectedLength = 6;
-    assert.strictEqual(generateRandomString().length,expectedLength);
+    assert.strictEqual(generateRandomStr().length,expectedLength);
   });
 });
 
