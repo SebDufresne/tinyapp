@@ -27,7 +27,7 @@
               <h2 class='card-title text-muted'>Edit</h2>
               <form method='POST' action='/urls/<%= shortURL %>?_method=PUT'>
                   <span class='card-text text-muted font-weight-bold'>New URL:</span>
-                  <input type='text' name='longURL' value='<%= url.longURL %>'>
+                  <input type='text' name='longURL' class='col-sm-4' value='<%= url.longURL %>'>
                   <button type='submit' class='btn btn-primary'>Update</button>
               </form> 
           </div>

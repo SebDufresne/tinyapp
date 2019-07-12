@@ -5,13 +5,14 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const methodOverride = require('method-override');
 const moment = require('moment-timezone');
+
+// Helper modules from helpers.js
+const createUniqueKey = require('./helpers').createUniqueKey;
 const generateRandomStr = require('./helpers.js').generateRandomStr;
+const getUserByEmail = require('./helpers').getUserByEmail;
 const listVisitors = require('./helpers').listVisitors;
 const listVisits = require('./helpers').listVisits;
 const sortVisitListDesc = require('./helpers').sortVisitListDesc;
-
-const createUniqueKey = require('./helpers').createUniqueKey;
-const getUserByEmail = require('./helpers').getUserByEmail;
 const urlsForUser = require('./helpers').urlsForUser;
 
 const PORT = process.env.PORT || 8080; // default port 8080
@@ -20,6 +21,7 @@ const app = express();
 
 // specify the static asset folder (css, images, etc)
 app.use(express.static('public'));
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(methodOverride('_method'));
@@ -88,7 +90,7 @@ app.get('/', (req, res) => {
 });
 
 // Displays Register Page
-// Redirect user to /urls if already lgged in
+// Redirect user to /urls if already logged in
 app.get('/register', (req, res) => {
   const user = users[req.session.userId] || '';
   if (user) {
@@ -158,7 +160,7 @@ app.post('/logout', (req, res) => {
 });
 
 // Redirects to another page
-// If shortURL doesn't exists, displays 404
+// If shortURL doesn't exist, displays 404
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
 
@@ -182,7 +184,7 @@ app.get('/u/:shortURL', (req, res) => {
     res.redirect(longURL);
   } else {
     const user = users[req.session.userId] || '';
-    const error = "The shortURL you're trying to access doesn't exist";
+    const error = "The shortURL you're trying to access doesn't exist.";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
@@ -209,7 +211,7 @@ app.post('/urls', (req, res) => {
     const templateVars = {user, shortURL, url, uniqVisitors, totalVisits, moment};
     res.render('urls_show', templateVars);
   } else {
-    const error = "You need to be logged in to add a shortURL";
+    const error = "You need to be logged in to add a shortURL.";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
@@ -227,10 +229,10 @@ app.get('/urls/new', (req, res) => {
   }
 });
 
-// Displays the informations for a short url belonging to a user
+// Displays the information for a short url belonging to a user
 // If the shortURL doesn't belong to the user, returns a 404
 // If the shortURL doesn't exist, returns a 404
-// If user isn't logged in, returns a 404
+// If the user isn't logged in, returns a 404
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
   const shortURL = req.params.shortURL;
@@ -243,7 +245,7 @@ app.get('/urls/:shortURL', (req, res) => {
         const templateVars = {user, shortURL, url, uniqVisitors, totalVisits, moment};
         res.render('urls_show', templateVars);
       } else {
-        const error = "You can only view informations of your shortURLs";
+        const error = "You can only view information of your shortURLs.";
         const templateVars = {user, error};
         res.render('404',templateVars);
       }
@@ -253,7 +255,7 @@ app.get('/urls/:shortURL', (req, res) => {
       res.render('404',templateVars);
     }
   } else {
-    const error = "You need to be logged in to display the informations of a shortURL";
+    const error = "You need to be logged in to display the information of a shortURL.";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
@@ -262,7 +264,7 @@ app.get('/urls/:shortURL', (req, res) => {
 // Modify a shortURL
 // If the shortURL doesn't belong to the user, returns a 404
 // If the shortURL doesn't exist, returns a 404
-// If user isn't logged in, returns a 404
+// If the user isn't logged in, returns a 404
 app.put('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
   const shortURL = req.params.shortURL;
@@ -272,17 +274,17 @@ app.put('/urls/:shortURL', (req, res) => {
         urlDatabase[shortURL].longURL = req.body.longURL;
         res.redirect('/urls');
       } else {
-        const error = "You can only modify URLs belonging to you";
+        const error = "You can only modify URLs that belongs to you.";
         const templateVars = {user, error};
         res.render('404',templateVars);
       }
     } else {
-      const error = "The URL you're trying to modify doesn't exists";
+      const error = "The URL you're trying to modify doesn't exist.";
       const templateVars = {user, error};
       res.render('404',templateVars);
     }
   } else {
-    const error = "You need to be logged in to modify a shortURL";
+    const error = "You need to be logged in to modify a shortURL.";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
@@ -291,7 +293,7 @@ app.put('/urls/:shortURL', (req, res) => {
 // Deletes a user shortURL
 // If the shortURL doesn't belong to the user, returns a 404
 // If the shortURL doesn't exist, returns a 404
-// If user isn't logged in, returns a 404
+// If the user isn't logged in, returns a 404
 app.delete('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userId] || '';
   const shortURL = req.params.shortURL;
@@ -301,23 +303,23 @@ app.delete('/urls/:shortURL', (req, res) => {
         delete urlDatabase[shortURL];
         res.redirect('/urls');
       } else {
-        const error = "You can only delete a URL that belongs to you";
+        const error = "You can only delete a URL that belongs to you.";
         const templateVars = {user, error};
         res.render('404',templateVars);
       }
     } else {
-      const error = "The shortURL you're trying to delete doesn't exists";
+      const error = "The shortURL you're trying to delete doesn't exist.";
       const templateVars = {user, error};
       res.render('404',templateVars);
     }
   } else {
-    const error = "You need to be logged in to delete a shortURL";
+    const error = "You need to be logged in to delete a shortURL.";
     const templateVars = {user, error};
     res.render('404',templateVars);
   }
 });
 
-// If the content isn't found redirect to 404
+// Default error page, when all else fails
 app.use((req, res) => {
   const user = users[req.session.userId] || '';
   const error = 'UNKOWN ERROR, the developer screwed up somewhere, ごめんなさい =^.^=';
@@ -325,6 +327,7 @@ app.use((req, res) => {
   res.render('404',templateVars);
 });
 
+// TinyApp listening on port
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });

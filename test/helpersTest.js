@@ -7,7 +7,7 @@ const listVisits = require('../helpers').listVisits;
 const sortVisitListDesc = require('../helpers').sortVisitListDesc;
 
 describe('generateRandomStr', function() {
-  it('Confirms it returns strings of 6 characters', function() {
+  it('Confirms it returns strings of 6 characters.', function() {
     const expectedLength = 6;
     assert.strictEqual(generateRandomStr().length,expectedLength);
   });
@@ -27,12 +27,12 @@ const testUsers = {
 };
 
 describe('getUserByEmail', function() {
-  it('Return a user based on a submitted email', function() {
+  it('Return a user based on a submitted email.', function() {
     const user = 'user@example.com';
     const expectedOutput = 'userRandomID';
     assert.strictEqual(getUserByEmail(user, testUsers),expectedOutput);
   });
-  it("Return an empty string if user doesn't exist", function() {
+  it("Return an empty string if the user doesn't exist.", function() {
     const user = 'noOne@example.com';
     const expectedOutput = '';
     assert.strictEqual(getUserByEmail(user, testUsers),expectedOutput);
@@ -107,7 +107,7 @@ describe('listVisitors', function() {
 });
 
 describe('listVisits', function() {
-  it('Returns empty array if the website has no visits', function() {
+  it('Returns empty array if the website has no visits.', function() {
     const urlId = 'noUrl';
     const expectedOutput = [];
     assert.deepEqual(listVisits(urlId,testDatabase),expectedOutput);
@@ -131,12 +131,12 @@ const testVisits = [
 ];
 
 describe('sortVisitListDesc', function() {
-  it('Returns empty array if the website has no visits', function() {
+  it('Returns empty array if the website has no visits.', function() {
     const visitList = [];
     const expectedOutput = [];
     assert.deepEqual(sortVisitListDesc(visitList),expectedOutput);
   });
-  it('Returns an array of visits sorted by date desc', function() {
+  it('Returns an array of visits sorted by descending dates.', function() {
     const expectedOutput = [
       {'6ac336': '2019-07-12T02:15:07.643Z'},
       {'b82da6': '2019-07-12T02:14:45.547Z'},

@@ -64,7 +64,7 @@ const sortByDate = (obj1, obj2) => {
   return new Date(Object.values(obj1)[0]) - new Date(Object.values(obj2)[0]);
 };
 
-// Sort an array of Visits in descending Order
+// Sort an array of visits in descending Order
 const sortVisitList = (list, sortOrder) => {
   return list.sort(sortOrder).reverse();
 };
