@@ -11,9 +11,11 @@
 <body>
   <% include ./partials/_header %>
   <main style='margin: 1em;'>
-    <div class='alert alert-danger shadow text-center rounded-lg my-3 mx-4' role='alert'>
-      <h4><%= error %></h4>
-    </div>
+    <% if (error) { %>
+      <div class='alert alert-danger shadow text-center rounded-lg my-3 mx-4' role='alert'>
+        <h4><%= error %></h4>
+      </div>
+    <% } %>
     <div class='text-center'>
       <img src='/img/page404.png' class='shadow img-fluid' alt='404 - Page Not Found'>
     </div>

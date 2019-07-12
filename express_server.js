@@ -322,7 +322,7 @@ app.delete('/urls/:shortURL', (req, res) => {
 // Default error page, when all else fails
 app.use((req, res) => {
   const user = users[req.session.userId] || '';
-  const error = 'UNKOWN ERROR, the developer screwed up somewhere, ごめんなさい =^.^=';
+  const error = '';
   const templateVars = {user, error};
   res.render('404',templateVars);
 });
