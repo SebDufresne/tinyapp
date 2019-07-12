@@ -65,8 +65,12 @@ const sortByDate = (obj1, obj2) => {
 };
 
 // Sort an array of Visits in descending Order
-const sortVisitListDesc = (list, sortOrder) => {
+const sortVisitList = (list, sortOrder) => {
   return list.sort(sortOrder).reverse();
+};
+
+const sortVisitListDesc = list => {
+  return sortVisitList(list,sortByDate);
 };
 
 module.exports = {
@@ -75,7 +79,6 @@ module.exports = {
   listVisits,
   generateRandomStr,
   getUserByEmail,
-  sortByDate,
   sortVisitListDesc,
   urlsForUser,
 };

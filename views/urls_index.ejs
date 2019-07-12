@@ -15,8 +15,14 @@
     <% include ./partials/_loginRequired %>
   <% } else { %>
   <main style='margin: 1em;'>
-    <h3>My URLs</h3>
-
+    <div>
+    <h3 class="d-inline m-3">My URLs</h3>
+    <form method='GET' class='float-right form-inline mb-3' action='/urls/new'>
+      <div class='button'>
+        <button type='submit' class='btn btn-success'>Create New URL</button>
+      </div>
+    </form>
+  </div>
     <table class="table table-condensed" style="border-collapse:collapse;">
       <thead>
         <tr>
@@ -55,7 +61,25 @@
           <tr>
             <td colspan="5" class="hiddenRow">
               <div id="url-<%= url %>" class="accordian-body collapse">
-                <%= url %>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Guest Cookie Id</th>
+                      <th>Visit Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <% const list = listVisits(url,urls) %>
+                      <% for (const visit of list) { %>
+                        <% for (const key in visit) { %>
+                    <tr>
+                      <td><%= key %></td>
+                      <td><%= moment(visit[key]).format('YYYY-MM-DD HH:mm [UTC]'); %></td>
+                    </tr>
+                    <% } %>
+                  <% } %>
+                  </tbody>
+                </table>
               </div>
             </td>
           </tr>

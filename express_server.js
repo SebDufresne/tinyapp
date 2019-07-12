@@ -8,7 +8,6 @@ const moment = require('moment-timezone');
 const generateRandomStr = require('./helpers.js').generateRandomStr;
 const listVisitors = require('./helpers').listVisitors;
 const listVisits = require('./helpers').listVisits;
-const sortByDate = require('./helpers').sortByDate;
 const sortVisitListDesc = require('./helpers').sortVisitListDesc;
 
 const createUniqueKey = require('./helpers').createUniqueKey;
@@ -193,14 +192,8 @@ app.get('/u/:shortURL', (req, res) => {
 // If the user isn't logged in, gives 404
 app.get('/urls', (req, res) => {
   const user = users[req.session.userId] || '';
-  if (user) {
-    const templateVars = {user, urls: urlsForUser(user.id,urlDatabase), moment};
-    res.render('urls_index', templateVars);
-  } else {
-    const error = 'You need to login to display this page';
-    const templateVars = {user, error};
-    res.render('404',templateVars);
-  }
+  const templateVars = {user, urls: urlsForUser(user.id,urlDatabase), sortVisitListDesc, listVisits, moment};
+  res.render('urls_index', templateVars);
 });
 
 // Adds a URL to the user profile

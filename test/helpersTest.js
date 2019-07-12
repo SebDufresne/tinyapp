@@ -4,7 +4,6 @@ const getUserByEmail = require('../helpers').getUserByEmail;
 const urlsForUser = require('../helpers').urlsForUser;
 const listVisitors = require('../helpers').listVisitors;
 const listVisits = require('../helpers').listVisits;
-const sortByDate = require('../helpers').sortByDate;
 const sortVisitListDesc = require('../helpers').sortVisitListDesc;
 
 describe('generateRandomStr', function() {
@@ -131,11 +130,11 @@ const testVisits = [
   {'b82da6': '2019-07-12T02:14:38.574Z'}
 ];
 
-describe('sortVisitListDesc with sortByDate', function() {
+describe('sortVisitListDesc', function() {
   it('Returns empty array if the website has no visits', function() {
     const visitList = [];
     const expectedOutput = [];
-    assert.deepEqual(sortVisitListDesc(visitList,sortByDate),expectedOutput);
+    assert.deepEqual(sortVisitListDesc(visitList),expectedOutput);
   });
   it('Returns an array of visits sorted by date desc', function() {
     const expectedOutput = [
@@ -144,6 +143,6 @@ describe('sortVisitListDesc with sortByDate', function() {
       {'b82da6': '2019-07-12T02:14:38.574Z'},
       {'b82da6': '2019-07-12T02:14:29.343Z'},
     ];
-    assert.deepEqual(sortVisitListDesc(testVisits,sortByDate),expectedOutput);
+    assert.deepEqual(sortVisitListDesc(testVisits),expectedOutput);
   });
 });
