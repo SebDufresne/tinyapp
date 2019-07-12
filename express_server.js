@@ -65,6 +65,11 @@ const users = {
   }
 };
 
+// Displays list of URLs in JSON format
+app.get('/urls.json', (req, res) => {
+  res.json(urlDatabase);
+});
+
 // Displays login page if user isn't logged in
 // Displays /urls if user is logged in
 app.get('/', (req, res) => {
@@ -159,14 +164,18 @@ app.get('/u/:shortURL', (req, res) => {
     res.cookie('guestId',guestId);
   }
 
-
-
-  // Standard page redirection
-  const user = users[req.session.userId] || '';
   if (urlDatabase[req.params.shortURL]) {
+    // Increment visits
+    if (!urlDatabase[req.params.shortURL].visited[guestId]) {
+      urlDatabase[req.params.shortURL].visited[guestId] = [];
+    }
+    urlDatabase[req.params.shortURL].visited[guestId].push(new Date());
+
+    // Page redirection
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
   } else {
+    const user = users[req.session.userId] || '';
     const error = "The tinyURL you're trying to access doesn't exist";
     const templateVars = {user, error};
     res.render('404',templateVars);
